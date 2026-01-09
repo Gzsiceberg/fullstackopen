@@ -1,14 +1,14 @@
 import { useEffect } from 'react'
 import { useState } from 'react'
-import axios from 'axios'
 import personService from './service'
 
 const Persons = (props) => {
-  let persons = props.persons
+  const persons = props.persons
+  const delPerson = props.delPerson
   return (
     <div>
       {persons.map(person =>
-        <p key={person.name}>{person.name} {person.number}</p>
+        <p key={person.name}>{person.name} {person.number} <button onClick={() => delPerson(person.id)}>delete</button></p>
       )}
     </div>)
 }
@@ -89,6 +89,13 @@ const App = () => {
     )
   }
 
+  const delPerson = (id) => {
+    personService.del(id).then(() => {
+      console.log('deleted successfully')
+      setPersons(persons.filter(person => person.id !== id))
+    })
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -104,7 +111,7 @@ const App = () => {
       />
 
       <h2>Numbers</h2>
-      <Persons persons={personsToShow} />
+      <Persons persons={personsToShow} delPerson={delPerson} />
     </div>
   )
 }
