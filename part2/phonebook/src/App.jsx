@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useState } from 'react'
 import personService from './service'
+import service from './service'
 
 const Persons = (props) => {
   const persons = props.persons
@@ -67,7 +68,16 @@ const App = () => {
       number: newPhoneNumber
     }
     if (persons.some(person => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`)
+      const id = persons.find(person => person.name === newName).id
+      window.confirm("This name already exists in the phonebook. Do you want to update the number?") &&
+        service.update(id, personObject).then(returnedPerson => {
+          setPersons(persons.map(person => person.id !== id ? person : returnedPerson))
+        }).catch(error => {
+          alert(`the person '${newName}' was already deleted from server`)
+          setPersons(persons.filter(person => person.id !== id))
+        })
+      setNewName('')
+      setNewPhoneNumber('')
       return
     }
     personService.create(personObject).then(returnedPerson => {
@@ -90,8 +100,7 @@ const App = () => {
   }
 
   const delPerson = (id) => {
-    window.confirm('Are you sure you want to delete this person?') &&
-    personService.del(id).then(() => {
+    window.confirm('Are you sure you want to delete this person?') && personService.del(id).then(() => {
       console.log('deleted successfully')
       setPersons(persons.filter(person => person.id !== id))
     })
