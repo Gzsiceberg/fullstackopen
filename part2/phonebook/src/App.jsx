@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useState } from 'react'
 import axios from 'axios'
+import personService from './service'
 
 const Persons = (props) => {
   let persons = props.persons
@@ -40,11 +41,10 @@ const App = () => {
 
   const hook = () => {
     console.log('effect')
-    axios
-      .get('http://192.168.5.10:3001/persons')
-      .then(response => {
+    personService.getAll()
+      .then(data => {
         console.log('promise fulfilled')
-        setPersons(response.data)
+        setPersons(data)
       })
   }
 
@@ -70,7 +70,9 @@ const App = () => {
       alert(`${newName} is already added to phonebook`)
       return
     }
-    setPersons(persons.concat(personObject))
+    personService.create(personObject).then(returnedPerson => {
+      setPersons(persons.concat(returnedPerson))
+    })
     setNewName('')
     setNewPhoneNumber('')
   }
