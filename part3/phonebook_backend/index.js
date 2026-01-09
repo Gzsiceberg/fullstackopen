@@ -58,18 +58,27 @@ app.get('/info', (request, response) => {
 })
 
 const generateId = () => {
-    const maxId = persons.length > 0
-        ? Math.max(...persons.map(n => Number(n.id)))
-        : 0
-    return String(maxId + 1)
+    return String(Math.floor(Math.random() * 10000) + 1000)
 }
 
 app.post('/api/persons', (request, response) => {
     const body = request.body
 
-    if (!body.content) {
+    if (!body) {
         return response.status(400).json({
-            error: 'content missing'
+            error: 'request body missing'
+        })
+    }
+
+    if (!body.name) {
+        return response.status(400).json({
+            error: 'name missing'
+        })
+    }
+
+    if (!body.number) {
+        return response.status(400).json({
+            error: 'number missing'
         })
     }
 
