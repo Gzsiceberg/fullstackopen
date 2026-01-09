@@ -90,6 +90,7 @@ const App = () => {
   }
 
   const delPerson = (id) => {
+    window.confirm('Are you sure you want to delete this person?') &&
     personService.del(id).then(() => {
       console.log('deleted successfully')
       setPersons(persons.filter(person => person.id !== id))
