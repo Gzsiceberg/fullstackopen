@@ -35,6 +35,92 @@ test('get blogs', async () => {
     assert(blogs.length === 2)
 })
 
+test('blog posts have id property instead of _id', async () => {
+    const response = await api
+        .get('/api/blogs')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+    const blogs = response.body
+    assert(blogs.length > 0)
+
+    blogs.forEach(blog => {
+        assert(blog.id !== undefined)
+        assert(blog._id === undefined)
+    })
+})
+
+test('a valid blog can be added', async () => {
+    const newBlog = {
+        title: 'Test Blog Post',
+        author: 'Test Author',
+        url: 'http://example.com/test',
+        likes: 5
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const response = await api.get('/api/blogs')
+    const blogs = response.body
+
+    assert(blogs.length === 3)
+
+    const titles = blogs.map(blog => blog.title)
+    assert(titles.includes('Test Blog Post'))
+})
+
+test('if likes property is missing, it defaults to 0', async () => {
+    const newBlog = {
+        title: 'Blog without likes',
+        author: 'Test Author',
+        url: 'http://example.com/no-likes'
+    }
+
+    const response = await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    assert(response.body.likes === 0)
+})
+
+test('blog without title is not added', async () => {
+    const newBlog = {
+        author: 'Test Author',
+        url: 'http://example.com/no-title',
+        likes: 5
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+
+    const response = await api.get('/api/blogs')
+    assert(response.body.length === 2)
+})
+
+test('blog without url is not added', async () => {
+    const newBlog = {
+        title: 'Blog without URL',
+        author: 'Test Author',
+        likes: 5
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+
+    const response = await api.get('/api/blogs')
+    assert(response.body.length === 2)
+})
+
 after(async () => {
     await mongoose.connection.close()
 })

@@ -55,6 +55,12 @@ router.post('/', async (request, response) => {
         })
     }
 
+    if (!body.title || !body.url) {
+        return response.status(400).json({
+            error: 'title or url missing'
+        })
+    }
+
     const person = new Blogs(request.body)
     const result = await person.save()
     response.status(201).json(result)
