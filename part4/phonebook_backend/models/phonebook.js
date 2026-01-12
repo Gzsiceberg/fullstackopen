@@ -1,16 +1,4 @@
 const mongoose = require('mongoose')
-const logger = require('../utils/logger')
-const config = require('../utils/config')
-
-const url = config.MONGODB_URI
-
-mongoose.set('strictQuery', false)
-
-mongoose.connect(url, { family: 4 }).then(() => {
-    logger.info('connected to MongoDB')
-}).catch((error) => {
-    logger.error('error connecting to MongoDB:', error.message)
-})
 
 const phonebookSchema = new mongoose.Schema({
     name: { type: String, required: true, minLength: 3 },

@@ -1,8 +1,19 @@
 const express = require('express')
 const middleware = require('./utils/middleware')
 const phonebooksRouter = require('./controllers/phonebooks')
+const mongoose = require('mongoose')
 
 const app = express()
+const logger = require('../utils/logger')
+const config = require('../utils/config')
+
+logger.info('connecting to mongoDB')
+mongoose.connect(config.MONGODB_URI, { family: 4 }).then(() => {
+    logger.info('connected to MongoDB')
+}).catch((error) => {
+    logger.error('error connecting to MongoDB:', error.message)
+})
+
 app.use(express.static('dist'))
 app.use(express.json())
 
