@@ -1,10 +1,9 @@
 const router = require('express').Router()
 const Blogs = require('../models/blogs')
 
-router.get('/', (request, response, next) => {
-    Blogs.find({}).then((blogs) => {
-        response.json(blogs)
-    }).catch(error => next(error))
+router.get('/', async (request, response) => {
+    const blog = await Blogs.find({})
+    response.json(blog)
 })
 
 // router.get('/:id', (request, response, next) => {
@@ -47,7 +46,7 @@ router.get('/', (request, response, next) => {
 //     ).catch(error => next(error))
 // })
 
-router.post('/', (request, response, next) => {
+router.post('/', async (request, response) => {
     const body = request.body
 
     if (!body) {
@@ -57,9 +56,8 @@ router.post('/', (request, response, next) => {
     }
 
     const person = new Blogs(request.body)
-    person.save().then(result => {
-        response.status(201).json(result)
-    }).catch(error => next(error))
+    const result = await person.save()
+    response.status(201).json(result)
 })
 
 module.exports = router
