@@ -26,7 +26,7 @@ app.get('/api/persons/:id', (request, response, next) => {
         .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
     const id = request.params.id
     Phonebook.findByIdAndDelete(id)
         .then(() => {
@@ -37,21 +37,21 @@ app.delete('/api/persons/:id', (request, response) => {
         })
 })
 
-app.get('/api/persons', (request, response) => {
+app.get('/api/persons', (request, response, next) => {
     Phonebook.find({}).then(persons => {
         response.json(persons)
-    })
+    }).catch(error => next(error))
 })
 
-app.get('/info', (request, response) => {
+app.get('/info', (request, response, next) => {
     Phonebook.find({}).then(persons => {
         const date = new Date()
         const info = `<p>Phonebook has info for ${persons.length} people</p><p>${date}</p>`
         response.send(info)
-    })
+    }).catch(error => next(error))
 })
 
-app.put('/api/persons/:id', (request, response) => {
+app.put('/api/persons/:id', (request, response, next) => {
     const id = request.params.id
     const body = request.body
 
@@ -67,7 +67,7 @@ app.put('/api/persons/:id', (request, response) => {
     ).catch(error => next(error))
 })
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body
 
     if (!body) {
@@ -76,17 +76,17 @@ app.post('/api/persons', (request, response) => {
         })
     }
 
-    if (!body.name) {
-        return response.status(400).json({
-            error: 'name missing'
-        })
-    }
+    // if (!body.name) {
+    //     return response.status(400).json({
+    //         error: 'name missing'
+    //     })
+    // }
 
-    if (!body.number) {
-        return response.status(400).json({
-            error: 'number missing'
-        })
-    }
+    // if (!body.number) {
+    //     return response.status(400).json({
+    //         error: 'number missing'
+    //     })
+    // }
 
     const person = new Phonebook({
         name: body.name,
@@ -95,9 +95,7 @@ app.post('/api/persons', (request, response) => {
 
     person.save().then(savedPerson => {
         response.json(savedPerson)
-    }).catch(error => {
-        next(error)
-    })
+    }).catch(error => next(error))
 })
 
 const unknownEndpoint = (request, response) => {
@@ -113,6 +111,8 @@ const errorHandler = (error, request, response, next) => {
 
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' })
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).json({ error: error.message })
     }
 
     next(error)
