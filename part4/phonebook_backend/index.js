@@ -1,7 +1,7 @@
 const express = require('express')
-const Phonebook = require('./models/phonebook')
 const logger = require('./utils/logger')
 const config = require('./utils/config')
+const phonebooksRouter = require('./controllers/phonebooks')
 const app = express()
 app.use(express.json())
 app.use(express.static('dist'))
@@ -14,76 +14,14 @@ app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
 })
 
-app.get('/api/persons/:id', (request, response, next) => {
-    const id = request.params.id
-    Phonebook.findById(id)
-        .then(person => {
-            if (person) {
-                response.json(person)
-            } else {
-                response.status(404).end()
-            }
-        })
-        .catch(error => next(error))
-})
-
-app.delete('/api/persons/:id', (request, response, next) => {
-    const id = request.params.id
-    Phonebook.findByIdAndDelete(id)
-        .then(() => {
-            response.status(204).end()
-        })
-        .catch(error => {
-            next(error)
-        })
-})
-
-app.get('/api/persons', (request, response, next) => {
-    Phonebook.find({}).then(persons => {
-        response.json(persons)
-    }).catch(error => next(error))
-})
+app.use('/api/persons', phonebooksRouter)
 
 app.get('/info', (request, response, next) => {
+    const Phonebook = require('./models/phonebook')
     Phonebook.find({}).then(persons => {
         const date = new Date()
         const info = `<p>Phonebook has info for ${persons.length} people</p><p>${date}</p>`
         response.send(info)
-    }).catch(error => next(error))
-})
-
-app.put('/api/persons/:id', (request, response, next) => {
-    const id = request.params.id
-    const body = request.body
-
-    Phonebook.findById(id).then(personInDb => {
-        if (!personInDb) {
-            return response.status(404).end()
-        }
-
-        personInDb.number = body.number
-        personInDb.name = body.name
-        return personInDb.save().then(updatedPerson => response.json(updatedPerson))
-    }
-    ).catch(error => next(error))
-})
-
-app.post('/api/persons', (request, response, next) => {
-    const body = request.body
-
-    if (!body) {
-        return response.status(400).json({
-            error: 'request body missing'
-        })
-    }
-
-    const person = new Phonebook({
-        name: body.name,
-        number: body.number,
-    })
-
-    person.save().then(savedPerson => {
-        response.json(savedPerson)
     }).catch(error => next(error))
 })
 
