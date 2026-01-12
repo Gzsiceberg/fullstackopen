@@ -64,9 +64,7 @@ app.put('/api/persons/:id', (request, response) => {
         .then(updatedPerson => {
             response.json(updatedPerson)
         })
-        .catch(error => {
-            next(error)
-        })
+        .catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response) => {
@@ -103,7 +101,7 @@ app.post('/api/persons', (request, response) => {
 })
 
 const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: 'unknown endpoint' })
+    response.status(404).send({ error: 'unknown endpoint' })
 }
 
 // handler of requests with unknown endpoint
