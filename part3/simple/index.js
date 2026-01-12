@@ -12,7 +12,14 @@ app.get('/', (request, response) => {
 app.get('/api/notes/:id', (request, response) => {
     const id = request.params.id
     Note.findById(id).then(note => {
-        response.json(note)
+        if (note) {
+            response.json(note)
+        } else {
+            response.status(404).end()
+        }
+    }).catch(error => {
+        console.log(error)
+        response.status(400).send({ error: 'malformatted id' })
     })
 })
 

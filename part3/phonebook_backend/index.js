@@ -3,19 +3,17 @@ const express = require('express')
 const Phonebook = require('./models/phonebook')
 const app = express()
 app.use(express.json())
-
 app.use(express.static('dist'))
 
 const morgan = require('morgan')
 morgan.token('body', (req) => JSON.stringify(req.body))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
 
-
 app.get('/', (request, response) => {
     response.send('<h1>Hello World!</h1>')
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
     const id = request.params.id
     Phonebook.findById(id)
         .then(person => {
@@ -25,10 +23,7 @@ app.get('/api/persons/:id', (request, response) => {
                 response.status(404).end()
             }
         })
-        .catch(error => {
-            console.log(error)
-            response.status(500).end()
-        })
+        .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -38,8 +33,7 @@ app.delete('/api/persons/:id', (request, response) => {
             response.status(204).end()
         })
         .catch(error => {
-            console.log(error)
-            response.status(500).end()
+            next(error)
         })
 })
 
@@ -71,8 +65,7 @@ app.put('/api/persons/:id', (request, response) => {
             response.json(updatedPerson)
         })
         .catch(error => {
-            console.log(error)
-            response.status(500).end()
+            next(error)
         })
 })
 
@@ -105,10 +98,28 @@ app.post('/api/persons', (request, response) => {
     person.save().then(savedPerson => {
         response.json(savedPerson)
     }).catch(error => {
-        console.log(error)
-        response.status(500).end()
+        next(error)
     })
 })
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: 'unknown endpoint' })
+}
+
+// handler of requests with unknown endpoint
+app.use(unknownEndpoint)
+
+// this has to be the last loaded middleware, also all the routes should be registered before this!
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({ error: 'malformatted id' })
+    }
+
+    next(error)
+}
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
