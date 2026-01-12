@@ -1,9 +1,10 @@
 const mongoose = require('mongoose')
+const logger = require('./utils/logger')
 
 const argCount = process.argv.length
 
 if (process.argv.length < 3) {
-    console.log('give password as argument')
+    logger.info('give password as argument')
     process.exit(1)
 }
 
@@ -14,9 +15,9 @@ const url = `mongodb+srv://csgu_db_user:${password}@cluster0.wcyvzlz.mongodb.net
 mongoose.set('strictQuery', false)
 
 mongoose.connect(url, { family: 4 }).then(() => {
-    console.log('connected to MongoDB')
+    logger.info('connected to MongoDB')
 }).catch((error) => {
-    console.log('error connecting to MongoDB:', error.message)
+    logger.error('error connecting to MongoDB:', error.message)
 })
 
 const phonebookSchema = new mongoose.Schema({
@@ -36,7 +37,7 @@ if (argCount === 5) {
     })
 
     entry.save().then(() => {
-        console.log(`added ${name} number ${number} to phonebook`)
+        logger.info(`added ${name} number ${number} to phonebook`)
         mongoose.connection.close()
     })
     return
@@ -44,7 +45,7 @@ if (argCount === 5) {
 
 Phonebook.find({}).then(result => {
     result.forEach(entry => {
-        console.log(entry)
+        logger.info(entry)
     })
     mongoose.connection.close()
 })

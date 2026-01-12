@@ -1,6 +1,7 @@
 require('dotenv').config()
 const express = require('express')
 const Phonebook = require('./models/phonebook')
+const logger = require('./utils/logger')
 const app = express()
 app.use(express.json())
 app.use(express.static('dist'))
@@ -95,7 +96,7 @@ app.use(unknownEndpoint)
 
 // this has to be the last loaded middleware, also all the routes should be registered before this!
 const errorHandler = (error, request, response, next) => {
-    console.error(error.message)
+    logger.error(error.message)
 
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' })
@@ -109,5 +110,5 @@ app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
+    logger.info(`Server running on port ${PORT}`)
 })
