@@ -1,7 +1,8 @@
 const mongoose = require('mongoose')
 const logger = require('../utils/logger')
+const config = require('../utils/config')
 
-const url = process.env.MONGODB_URI
+const url = config.MONGODB_URI
 
 mongoose.set('strictQuery', false)
 
