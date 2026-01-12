@@ -17,9 +17,7 @@ mongoose.connect(config.MONGODB_URI, { family: 4 }).then(() => {
 app.use(express.static('dist'))
 app.use(express.json())
 
-const morgan = require('morgan')
-morgan.token('body', (req) => JSON.stringify(req.body))
-app.use(morgan(':method :url :status :res[content-length] - :response-time ms :body'))
+app.use(middleware.requestLogger)
 
 app.use('/api/blogs', router)
 

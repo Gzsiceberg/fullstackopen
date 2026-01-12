@@ -1,4 +1,4 @@
-const { test, after, beforeEach } = require('node:test')
+const { test, after, beforeEach, describe } = require('node:test')
 const mongoose = require('mongoose')
 const Blogs = require('../models/blogs')
 const supertest = require('supertest')
@@ -26,99 +26,163 @@ beforeEach(async () => {
     await Blogs.insertMany(initialBlogs)
 })
 
-test('get blogs', async () => {
-    const response = await api
-        .get('/api/blogs')
-        .expect(200)
-        .expect('Content-Type', /application\/json/)
-    const blogs = response.body
-    assert(blogs.length === 2)
-})
+describe('when there are initially some blogs saved', () => {
+    test('blogs are returned as json', async () => {
+        await api
+            .get('/api/blogs')
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+    })
 
-test('blog posts have id property instead of _id', async () => {
-    const response = await api
-        .get('/api/blogs')
-        .expect(200)
-        .expect('Content-Type', /application\/json/)
+    test('all blogs are returned', async () => {
+        const response = await api.get('/api/blogs')
+        assert(response.body.length === 2)
+    })
 
-    const blogs = response.body
-    assert(blogs.length > 0)
+    test('blog posts have id property instead of _id', async () => {
+        const response = await api
+            .get('/api/blogs')
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
 
-    blogs.forEach(blog => {
-        assert(blog.id !== undefined)
-        assert(blog._id === undefined)
+        const blogs = response.body
+        assert(blogs.length > 0)
+
+        blogs.forEach(blog => {
+            assert(blog.id !== undefined)
+            assert(blog._id === undefined)
+        })
     })
 })
 
-test('a valid blog can be added', async () => {
-    const newBlog = {
-        title: 'Test Blog Post',
-        author: 'Test Author',
-        url: 'http://example.com/test',
-        likes: 5
-    }
+describe('addition of a new blog', () => {
+    test('a valid blog can be added', async () => {
+        const newBlog = {
+            title: 'Test Blog Post',
+            author: 'Test Author',
+            url: 'http://example.com/test',
+            likes: 5
+        }
 
-    await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(201)
-        .expect('Content-Type', /application\/json/)
+        await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
 
-    const response = await api.get('/api/blogs')
-    const blogs = response.body
+        const response = await api.get('/api/blogs')
+        const blogs = response.body
 
-    assert(blogs.length === 3)
+        assert(blogs.length === 3)
 
-    const titles = blogs.map(blog => blog.title)
-    assert(titles.includes('Test Blog Post'))
+        const titles = blogs.map(blog => blog.title)
+        assert(titles.includes('Test Blog Post'))
+    })
+
+    test('if likes property is missing, it defaults to 0', async () => {
+        const newBlog = {
+            title: 'Blog without likes',
+            author: 'Test Author',
+            url: 'http://example.com/no-likes'
+        }
+
+        const response = await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
+
+        assert(response.body.likes === 0)
+    })
+
+    test('blog without title is not added', async () => {
+        const newBlog = {
+            author: 'Test Author',
+            url: 'http://example.com/no-title',
+            likes: 5
+        }
+
+        await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(400)
+
+        const response = await api.get('/api/blogs')
+        assert(response.body.length === 2)
+    })
+
+    test('blog without url is not added', async () => {
+        const newBlog = {
+            title: 'Blog without URL',
+            author: 'Test Author',
+            likes: 5
+        }
+
+        await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(400)
+
+        const response = await api.get('/api/blogs')
+        assert(response.body.length === 2)
+    })
 })
 
-test('if likes property is missing, it defaults to 0', async () => {
-    const newBlog = {
-        title: 'Blog without likes',
-        author: 'Test Author',
-        url: 'http://example.com/no-likes'
-    }
+describe('deletion of a blog', () => {
+    test('a blog can be deleted', async () => {
+        const blogsAtStart = await api.get('/api/blogs')
+        const blogToDelete = blogsAtStart.body[0]
 
-    const response = await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(201)
-        .expect('Content-Type', /application\/json/)
+        await api
+            .delete(`/api/blogs/${blogToDelete.id}`)
+            .expect(204)
 
-    assert(response.body.likes === 0)
+        const blogsAtEnd = await api.get('/api/blogs')
+        assert(blogsAtEnd.body.length === blogsAtStart.body.length - 1)
+
+        const titles = blogsAtEnd.body.map(blog => blog.title)
+        assert(!titles.includes(blogToDelete.title))
+    })
 })
 
-test('blog without title is not added', async () => {
-    const newBlog = {
-        author: 'Test Author',
-        url: 'http://example.com/no-title',
-        likes: 5
-    }
+describe('updating a blog', () => {
+    test('a blog can be updated', async () => {
+        const blogsAtStart = await api.get('/api/blogs')
+        const blogToUpdate = blogsAtStart.body[0]
 
-    await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(400)
+        const updatedData = {
+            ...blogToUpdate,
+            likes: 100
+        }
 
-    const response = await api.get('/api/blogs')
-    assert(response.body.length === 2)
-})
+        const response = await api
+            .put(`/api/blogs/${blogToUpdate.id}`)
+            .send(updatedData)
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
 
-test('blog without url is not added', async () => {
-    const newBlog = {
-        title: 'Blog without URL',
-        author: 'Test Author',
-        likes: 5
-    }
+        assert(response.body.likes === 100)
+    })
 
-    await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(400)
+    test('updating likes increases the number', async () => {
+        const blogsAtStart = await api.get('/api/blogs')
+        const blogToUpdate = blogsAtStart.body[0]
+        const originalLikes = blogToUpdate.likes
 
-    const response = await api.get('/api/blogs')
-    assert(response.body.length === 2)
+        const updatedData = {
+            ...blogToUpdate,
+            likes: originalLikes + 1
+        }
+
+        await api
+            .put(`/api/blogs/${blogToUpdate.id}`)
+            .send(updatedData)
+            .expect(200)
+
+        const blogsAtEnd = await api.get('/api/blogs')
+        const updatedBlog = blogsAtEnd.body.find(blog => blog.id === blogToUpdate.id)
+        assert(updatedBlog.likes === originalLikes + 1)
+    })
 })
 
 after(async () => {
