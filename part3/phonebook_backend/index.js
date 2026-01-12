@@ -57,6 +57,25 @@ app.get('/info', (request, response) => {
     })
 })
 
+app.put('/api/persons/:id', (request, response) => {
+    const id = request.params.id
+    const body = request.body
+
+    const person = {
+        name: body.name,
+        number: body.number,
+    }
+
+    Phonebook.findByIdAndUpdate(id, person, { new: true })
+        .then(updatedPerson => {
+            response.json(updatedPerson)
+        })
+        .catch(error => {
+            console.log(error)
+            response.status(500).end()
+        })
+})
+
 app.post('/api/persons', (request, response) => {
     const body = request.body
 
@@ -78,24 +97,13 @@ app.post('/api/persons', (request, response) => {
         })
     }
 
-    Phonebook.find({ name: body.name }).then(existingPersons => {
-        if (existingPersons.length > 0) {
-            return response.status(400).json({
-                error: 'name must be unique'
-            })
-        }
+    const person = new Phonebook({
+        name: body.name,
+        number: body.number,
+    })
 
-        const person = new Phonebook({
-            name: body.name,
-            number: body.number,
-        })
-
-        person.save().then(savedPerson => {
-            response.json(savedPerson)
-        }).catch(error => {
-            console.log(error)
-            response.status(500).end()
-        })
+    person.save().then(savedPerson => {
+        response.json(savedPerson)
     }).catch(error => {
         console.log(error)
         response.status(500).end()
