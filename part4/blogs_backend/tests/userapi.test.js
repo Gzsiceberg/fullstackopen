@@ -63,6 +63,27 @@ describe('when there is initially one user in db', () => {
 
         assert(usersAtEnd.length, usersAtStart.length)
     })
+
+    test('creation fails with proper statuscode and message if password is too short', async () => {
+        const usersAtStart = await usersInDb()
+
+        const newUser = {
+            username: 'testuser',
+            name: 'Test User',
+            password: 'ab',
+        }
+
+        const result = await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
+        assert(result.body.error.includes('Password must be at least 3 characters long'))
+
+        const usersAtEnd = await usersInDb()
+        assert.strictEqual(usersAtEnd.length, usersAtStart.length)
+    })
 })
 
 
