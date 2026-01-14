@@ -4,6 +4,10 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
 router.post('/', async (req, res) => {
+    if (!req.body.username || !req.body.password) {
+        return res.status(400).json({ error: 'username and password required' })
+    }
+
     const { username, password } = req.body
 
     const user = await User.findOne({ username })
