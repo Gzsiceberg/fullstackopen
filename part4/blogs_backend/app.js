@@ -1,6 +1,7 @@
 const express = require('express')
 const middleware = require('./utils/middleware')
 const router = require('./controllers/blogs')
+const userRouter = require('./controllers/users')
 const mongoose = require('mongoose')
 
 const app = express()
@@ -20,6 +21,7 @@ app.use(express.json())
 app.use(middleware.requestLogger)
 
 app.use('/api/blogs', router)
+app.use('/api/users', userRouter)
 
 // handler of requests with unknown endpoint
 app.use(middleware.unknownEndpoint)
