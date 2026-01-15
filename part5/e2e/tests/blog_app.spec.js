@@ -81,6 +81,8 @@ describe('blog app', () => {
       const blogElement = page.locator('.blog').filter({ hasText: 'Blog to Delete' })
       await blogElement.getByRole('button', { name: 'view' }).click()
 
+      await expect(blogElement.locator('.blog-remove')).toBeVisible()
+
       // Set up dialog handler to accept the confirmation
       page.on('dialog', async dialog => {
         expect(dialog.type()).toBe('confirm')
@@ -89,7 +91,7 @@ describe('blog app', () => {
       })
 
       // Click the remove button
-      await blogElement.getByRole('button', { name: 'remove' }).click()
+      await page.locator('.blog-remove').click()
 
       // Verify the blog is no longer in the list
       await expect(page.locator('.blog').filter({ hasText: 'Blog to Delete' })).not.toBeVisible()

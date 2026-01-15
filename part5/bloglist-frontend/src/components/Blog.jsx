@@ -28,8 +28,7 @@ const Blog = ({ blog, handleLike, handleDelete, currentUser }) => {
     marginBottom: 5
   }
 
-  const isOwner = currentUser && blog.user === currentUser.id
-  console.log('Blog user:', blog.user, 'Current user:', currentUser)
+  const isOwner = currentUser && blog.user.username === currentUser.username
 
   return (
     <div style={blogStyle} className="blog">
@@ -44,7 +43,7 @@ const Blog = ({ blog, handleLike, handleDelete, currentUser }) => {
           <div>
             {blog.user ? blog.user.name : 'unknown'}
           </div>
-          {isOwner && <button onClick={() => handleDelete(blog)}>remove</button>}
+          {isOwner && <button className='blog-remove' onClick={() => handleDelete(blog)}>remove</button>}
         </Togglable>
       </div>
     </div>
