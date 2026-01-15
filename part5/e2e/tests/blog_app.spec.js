@@ -13,7 +13,7 @@ const createBlog = async (page, title, author, url) => {
   await page.getByLabel('author:').fill(author)
   await page.getByLabel('url:').fill(url)
   await page.getByRole('button', { name: 'create' }).click()
-  await expect(page.locator('.blog')).toContainText(title)
+  await expect(page.getByText(`${title} ${author}`)).toBeVisible()
 }
 
 describe('blog app', () => {
@@ -125,6 +125,53 @@ describe('blog app', () => {
 
       // Verify the delete button is NOT visible for the second user
       await expect(blogElement.locator('.blog-remove')).not.toBeVisible()
+    })
+
+    test('blogs are ordered by likes with most likes first', async ({ page }) => {
+      test.setTimeout(20000)
+      
+      // Create three blogs
+      await createBlog(page, 'First Blog', 'Author One', 'http://first.com')
+      await createBlog(page, 'Second Blog', 'Author Two', 'http://second.com')
+      await createBlog(page, 'Third Blog', 'Author Three', 'http://third.com')
+
+      // Give the first blog 2 likes
+      const firstBlog = page.locator('.blog').filter({ hasText: 'First Blog' })
+      await firstBlog.getByRole('button', { name: 'view' }).click()
+      await firstBlog.getByRole('button', { name: 'like' }).click()
+      await expect(firstBlog.locator('.blog-likes')).toContainText('likes 1')
+      await firstBlog.getByRole('button', { name: 'like' }).click()
+      await expect(firstBlog.locator('.blog-likes')).toContainText('likes 2')
+
+      // Give the second blog 5 likes
+      const secondBlog = page.locator('.blog').filter({ hasText: 'Second Blog' })
+      await secondBlog.getByRole('button', { name: 'view' }).click()
+      for (let i = 1; i <= 5; i++) {
+        await secondBlog.getByRole('button', { name: 'like' }).click()
+        await expect(secondBlog.locator('.blog-likes')).toContainText(`likes ${i}`)
+      }
+
+      // Give the third blog 3 likes
+      const thirdBlog = page.locator('.blog').filter({ hasText: 'Third Blog' })
+      await thirdBlog.getByRole('button', { name: 'view' }).click()
+      for (let i = 1; i <= 3; i++) {
+        await thirdBlog.getByRole('button', { name: 'like' }).click()
+        await expect(thirdBlog.locator('.blog-likes')).toContainText(`likes ${i}`)
+      }
+
+      // Get all blogs and verify they are ordered by likes (most likes first)
+      const blogs = await page.locator('.blog').all()
+      expect(blogs.length).toBe(3)
+      
+      // Extract blog content from .blog-title-author in order
+      const firstBlogText = await blogs[0].locator('.blog-title-author').textContent()
+      const secondBlogText = await blogs[1].locator('.blog-title-author').textContent()
+      const thirdBlogText = await blogs[2].locator('.blog-title-author').textContent()
+
+      // Verify order: Second Blog (5 likes), Third Blog (3 likes), First Blog (2 likes)
+      expect(firstBlogText).toContain('Second Blog')
+      expect(secondBlogText).toContain('Third Blog')
+      expect(thirdBlogText).toContain('First Blog')
     })
   })
 
