@@ -31,13 +31,13 @@ const Blog = ({ blog, handleLike, handleDelete, currentUser }) => {
   const isOwner = currentUser && blog.user && blog.user.username === currentUser.username
 
   return (
-    <div style={blogStyle}>
-      <div>
+    <div style={blogStyle} className="blog">
+      <div className="blog-title-author">
         {blog.title} {blog.author} <Togglable buttonLabel="view">
-          <div>
+          <div className="blog-url">
             {blog.url}
           </div>
-          <div>
+          <div className="blog-likes">
             likes {blog.likes} <button onClick={() => handleLike(blog)}>like</button>
           </div>
           <div>
