@@ -137,7 +137,7 @@ const App = () => {
 
   const handleDelete = async (blog) => {
     const confirmDelete = window.confirm(`Remove blog "${blog.title}" by ${blog.author}?`)
-    
+
     if (!confirmDelete) {
       return
     }
