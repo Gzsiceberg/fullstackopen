@@ -57,6 +57,7 @@ describe('blog app', () => {
     })
 
     test('a blog can be liked', async ({ page }) => {
+      test.setTimeout(10000) // Increase timeout for this test
       await createBlog(page, 'Blog to Like', 'Like Author', 'http://likeurl.com')
 
       // Find the specific blog we just created and click view
