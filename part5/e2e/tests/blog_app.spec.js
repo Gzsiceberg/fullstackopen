@@ -8,7 +8,14 @@ const loginWith = async (page, username, password) => {
 }
 
 describe('blog app', () => {
-  beforeEach(async ({ page }) => {
+  beforeEach(async ({ page, request }) => {
+    await request.post('/api/testing/reset')
+    const newUser = {
+      username: 'root',
+      name: 'Superuser',
+      password: 'sekret'
+    }
+    await request.post('/api/users', { data: newUser })
     await page.goto('/')
   })
 
