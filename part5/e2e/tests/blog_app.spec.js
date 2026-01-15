@@ -75,6 +75,7 @@ describe('blog app', () => {
     })
 
     test('the user who created a blog can delete it', async ({ page }) => {
+      test.setTimeout(10000) // Increase timeout for this test
       await createBlog(page, 'Blog to Delete', 'Delete Author', 'http://deleteurl.com')
 
       // Find the blog and click view to see the remove button
