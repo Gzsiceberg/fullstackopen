@@ -119,7 +119,6 @@ const App = () => {
   const handleLike = async (blog) => {
     try {
       const updatedBlog = {
-        user: blog.user.id,
         likes: blog.likes + 1,
         author: blog.author,
         title: blog.title,
@@ -127,7 +126,7 @@ const App = () => {
       }
 
       const returnedBlog = await blogService.update(blog.id, updatedBlog)
-      setBlogs(blogs.map(b => b.id !== blog.id ? b : { ...returnedBlog, user: blog.user }))
+      setBlogs(prevBlogs => prevBlogs.map(b => b.id !== blog.id ? b : { ...returnedBlog, user: blog.user }))
       // showNotification(`You liked "${blog.title}"`, 'success')
     } catch (exception) {
       console.log('Error updating blog:', exception)

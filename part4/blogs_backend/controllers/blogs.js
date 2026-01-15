@@ -55,7 +55,8 @@ router.put('/:id', async (request, response) => {
         title: body.title,
         author: body.author,
         url: body.url,
-        likes: body.likes
+        likes: body.likes,
+        user: request.user.id
     }
 
     const foundedBlog = await Blogs.findById(request.params.id)
