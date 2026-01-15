@@ -4,6 +4,8 @@ import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import Togglable from './components/Togglable'
+import { useRef } from 'react'
 
 const LoginForm = ({ username, password, handleLogin, setUsername, setPassword }) => {
   return (
@@ -32,19 +34,6 @@ const LoginForm = ({ username, password, handleLogin, setUsername, setPassword }
         </div>
         <button type="submit">login</button>
       </form>
-    </>
-  )
-}
-
-const Blogs = ({ user, blogs, handleLogout, blogForm }) => {
-  return (
-    <>
-      <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
-      {blogForm}
-      <h2>blogs</h2>
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
-      )}
     </>
   )
 }
@@ -113,10 +102,13 @@ const App = () => {
     showNotification('Logged out successfully', 'success')
   }
 
+  const blogFormRef = useRef()
+
   const addBlog = async (blogObject) => {
     try {
       const returnedBlog = await blogService.create(blogObject)
       setBlogs(blogs.concat(returnedBlog))
+      blogFormRef.current.toggleVisibility()
       showNotification(`A new blog "${returnedBlog.title}" by ${returnedBlog.author} added`, 'success')
     } catch (exception) {
       console.log('Error creating blog:', exception)
@@ -137,7 +129,18 @@ const App = () => {
         />
       }
 
-      {user && <Blogs user={user} blogs={blogs} handleLogout={handleLogout} blogForm={<BlogForm createBlog={addBlog} />} />}
+      {user &&
+        <>
+          <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
+          <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+            <BlogForm createBlog={addBlog} />
+          </Togglable>
+          <h2>blogs</h2>
+          {blogs.map(blog =>
+            <Blog key={blog.id} blog={blog} />
+          )}
+        </>
+      }
     </div>
   )
 }
