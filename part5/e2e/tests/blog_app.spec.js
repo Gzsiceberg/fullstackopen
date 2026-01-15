@@ -97,6 +97,35 @@ describe('blog app', () => {
       // Verify the blog is no longer in the list
       await expect(page.locator('.blog').filter({ hasText: 'Blog to Delete' })).not.toBeVisible()
     })
+
+    test('only the user who added the blog sees the delete button', async ({ page, request }) => {
+      test.setTimeout(10000)
+      
+      // Create a blog as the first user (root)
+      await createBlog(page, 'Root User Blog', 'Root Author', 'http://rootblog.com')
+
+      // Create a second user
+      const secondUser = {
+        username: 'testuser',
+        name: 'Test User',
+        password: 'testpass'
+      }
+      await request.post('/api/users', { data: secondUser })
+
+      // Log out the first user
+      await page.getByRole('button', { name: 'logout' }).click()
+
+      // Log in as the second user
+      await loginWith(page, 'testuser', 'testpass')
+      await expect(page.getByText('Test User logged in')).toBeVisible()
+
+      // Find the blog created by the first user and click view
+      const blogElement = page.locator('.blog').filter({ hasText: 'Root User Blog' })
+      await blogElement.getByRole('button', { name: 'view' }).click()
+
+      // Verify the delete button is NOT visible for the second user
+      await expect(blogElement.locator('.blog-remove')).not.toBeVisible()
+    })
   })
 
 })
