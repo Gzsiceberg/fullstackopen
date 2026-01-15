@@ -7,20 +7,19 @@ const assert = require('node:assert')
 const bcrypt = require('bcrypt')
 const api = supertest(app)
 
-beforeEach(async () => {
-    // Clear and set up initial data if necessary
-    await Users.deleteMany({})
-    const passwordsHash = await bcrypt.hash('sekret', 10)
-    const user = new Users({ username: 'root', name: 'Superuser', passwordHash: passwordsHash })
-    await user.save()
-})
-
 const usersInDb = async () => {
     const users = await Users.find({})
     return users.map(u => u.toJSON())
 }
 
 describe('when there is initially one user in db', () => {
+    beforeEach(async () => {
+        // Clear and set up initial data if necessary
+        await Users.deleteMany({})
+        const passwordsHash = await bcrypt.hash('sekret', 10)
+        const user = new Users({ username: 'root', name: 'Superuser', passwordHash: passwordsHash })
+        await user.save()
+    })
     test('creation succeeds with a fresh username', async () => {
         const usersAtStart = await usersInDb()
 

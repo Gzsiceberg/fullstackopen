@@ -7,19 +7,18 @@ const assert = require('node:assert')
 const bcrypt = require('bcrypt')
 const api = supertest(app)
 
-beforeEach(async () => {
-    // Clear and set up initial data
-    await Users.deleteMany({})
-    const passwordHash = await bcrypt.hash('sekret', 10)
-    const user = new Users({
-        username: 'root',
-        name: 'Superuser',
-        passwordHash
-    })
-    await user.save()
-})
-
 describe('login functionality', () => {
+    beforeEach(async () => {
+        // Clear and set up initial data
+        await Users.deleteMany({})
+        const passwordHash = await bcrypt.hash('sekret', 10)
+        const user = new Users({
+            username: 'root',
+            name: 'Superuser',
+            passwordHash
+        })
+        await user.save()
+    })
     test('succeeds with valid credentials', async () => {
         const loginCredentials = {
             username: 'root',
