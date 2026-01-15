@@ -19,7 +19,7 @@ const Togglable = (props) => {
   )
 }
 
-const Blog = ({ blog, handleLike }) => {
+const Blog = ({ blog, handleLike, handleDelete, currentUser }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -27,6 +27,9 @@ const Blog = ({ blog, handleLike }) => {
     borderWidth: 1,
     marginBottom: 5
   }
+
+  const isOwner = currentUser && blog.user && blog.user.username === currentUser.username
+
   return (
     <div style={blogStyle}>
       <div>
@@ -40,6 +43,7 @@ const Blog = ({ blog, handleLike }) => {
           <div>
             {blog.user.name}
           </div>
+          {isOwner && <button onClick={() => handleDelete(blog)}>remove</button>}
         </Togglable>
       </div>
     </div>

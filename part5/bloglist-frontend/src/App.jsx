@@ -135,7 +135,24 @@ const App = () => {
     }
   }
 
-  const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
+  const handleDelete = async (blog) => {
+    const confirmDelete = window.confirm(`Remove blog "${blog.title}" by ${blog.author}?`)
+    
+    if (!confirmDelete) {
+      return
+    }
+
+    try {
+      await blogService.remove(blog.id)
+      setBlogs(blogs.filter(b => b.id !== blog.id))
+      showNotification(`Blog "${blog.title}" removed`, 'success')
+    } catch (exception) {
+      console.log('Error deleting blog:', exception)
+      showNotification('Failed to delete blog', 'error')
+    }
+  }
+
+  const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes)
 
   return (
     <div>
@@ -158,7 +175,7 @@ const App = () => {
           </Togglable>
           <h2>blogs</h2>
           {sortedBlogs.map(blog =>
-            <Blog key={blog.id} blog={blog} handleLike={handleLike} />
+            <Blog key={blog.id} blog={blog} handleLike={handleLike} handleDelete={handleDelete} currentUser={user} />
           )}
         </>
       }
