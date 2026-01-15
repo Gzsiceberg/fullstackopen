@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
+import loginService from './services/login'
 
 const LoginForm = ({ username, password, handleLogin, setUsername, setPassword }) => {
   return (
@@ -33,10 +34,10 @@ const LoginForm = ({ username, password, handleLogin, setUsername, setPassword }
   )
 }
 
-const Blogs = ({ user, blogs }) => {
+const Blogs = ({ user, blogs, handleLogout }) => {
   return (
     <>
-      <p>{user.name} logged in</p>
+      <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
       <h2>blogs</h2>
       {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
@@ -57,21 +58,39 @@ const App = () => {
     )
   }, [])
 
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      setUser(user)
+      blogService.setToken(user.token)
+    }
+  }, [])
+
 
   const handleLogin = async (event) => {
     event.preventDefault()
     console.log('logging in with', username, password)
     try {
-      const user = {
-        username: username,
-        password: password
-      }
+      const user = await loginService.login({
+        username,
+        password
+      })
+      
+      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
+      blogService.setToken(user.token)
       setUser(user)
       setUsername('')
       setPassword('')
     } catch (exception) {
-      console.log('wrong credentials')
+      console.log('Wrong credentials')
     }
+  }
+
+  const handleLogout = () => {
+    window.localStorage.removeItem('loggedBlogappUser')
+    setUser(null)
+    blogService.setToken(null)
   }
 
   return (
@@ -86,7 +105,7 @@ const App = () => {
         />
       }
 
-      {user && <Blogs user={user} blogs={blogs} />}
+      {user && <Blogs user={user} blogs={blogs} handleLogout={handleLogout} />}
     </div>
   )
 }
