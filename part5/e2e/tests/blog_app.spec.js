@@ -71,7 +71,7 @@ describe('blog app', () => {
       await blogElement.getByRole('button', { name: 'like' }).click()
 
       // Wait for the like count to update - re-query the blog element since it might have moved
-      await expect(page.locator('.blog').filter({ hasText: 'Blog to Like' }).locator('.blog-likes')).toContainText('likes 1')
+      await expect(blogElement.locator('.blog-likes')).toContainText('likes 1')
     })
   })
 
