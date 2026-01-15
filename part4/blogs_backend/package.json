@@ -10,7 +10,8 @@
     "start": "NODE_ENV=production node index.js",
     "dev": "NODE_ENV=development node --watch index.js",
     "test": "NODE_ENV=test node --test --test-concurrency=1",
-    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push"
+    "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push",
+    "start:test": "NODE_ENV=test node --watch index.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
