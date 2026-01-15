@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
+import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -53,6 +54,14 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+  const [notification, setNotification] = useState(null)
+
+  const showNotification = (message, type = 'success') => {
+    setNotification({ message, type })
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
+  }
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -69,7 +78,7 @@ const App = () => {
           setUser(user)
           blogService.setToken(user.token)
         }
-      } catch (error) {
+      } catch {
         window.localStorage.removeItem('loggedBlogappUser')
       }
     }
@@ -90,8 +99,10 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
-    } catch (exception) {
+      showNotification(`Welcome ${user.name}!`, 'success')
+    } catch {
       console.log('Wrong credentials')
+      showNotification('Wrong username or password', 'error')
     }
   }
 
@@ -99,19 +110,23 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     setUser(null)
     blogService.setToken(null)
+    showNotification('Logged out successfully', 'success')
   }
 
   const addBlog = async (blogObject) => {
     try {
       const returnedBlog = await blogService.create(blogObject)
       setBlogs(blogs.concat(returnedBlog))
+      showNotification(`A new blog "${returnedBlog.title}" by ${returnedBlog.author} added`, 'success')
     } catch (exception) {
       console.log('Error creating blog:', exception)
+      showNotification('Failed to create blog', 'error')
     }
   }
 
   return (
     <div>
+      <Notification message={notification?.message} type={notification?.type} />
       {!user &&
         <LoginForm
           username={username}
