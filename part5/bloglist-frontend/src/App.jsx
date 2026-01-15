@@ -61,9 +61,15 @@ const App = () => {
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      setUser(user)
-      blogService.setToken(user.token)
+      try {
+        const user = JSON.parse(loggedUserJSON)
+        if (user && user.token) {
+          setUser(user)
+          blogService.setToken(user.token)
+        }
+      } catch (error) {
+        window.localStorage.removeItem('loggedBlogappUser')
+      }
     }
   }, [])
 
