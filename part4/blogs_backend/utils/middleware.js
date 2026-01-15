@@ -1,9 +1,20 @@
 const logger = require('./logger')
+const jwt = require('jsonwebtoken')
 
 const tokenExtractor = (request, response, next) => {
     const authorization = request.get('authorization')
     if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
         request.token = authorization.replace('Bearer ', '')
+    }
+    next()
+}
+
+const userExtractor = (request, response, next) => {
+    // This middleware assumes that tokenExtractor has already run
+    const token = request.token
+    if (token) {
+        const decodedToken = jwt.verify(token, process.env.SECRET)
+        request.user = decodedToken.id
     }
     next()
 }
@@ -36,4 +47,4 @@ const errorHandler = (error, request, response, next) => {
     next(error)
 }
 
-module.exports = { unknownEndpoint, errorHandler, requestLogger, tokenExtractor }
+module.exports = { unknownEndpoint, errorHandler, requestLogger, tokenExtractor, userExtractor }

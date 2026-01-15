@@ -1,7 +1,6 @@
 const router = require('express').Router()
 const Blogs = require('../models/blogs')
 const Users = require('../models/users')
-const jwt = require('jsonwebtoken')
 
 router.get('/', async (request, response) => {
     const blog = await Blogs.find({}).populate('user', { username: 1, name: 1 })
@@ -13,8 +12,7 @@ router.delete('/:id', async (request, response) => {
         return response.status(401).json({ error: 'token missing or invalid' })
     }
 
-    const decodedToken = jwt.verify(request.token, process.env.SECRET)
-    if (!decodedToken.id) {
+    if (!request.user) {
         return response.status(401).json({ error: 'token missing or invalid' })
     }
 
@@ -23,7 +21,7 @@ router.delete('/:id', async (request, response) => {
         return response.status(404).end()
     }
 
-    if (blog.user.toString() !== decodedToken.id.toString()) {
+    if (blog.user.toString() !== request.user.toString()) {
         return response.status(401).json({ error: 'only the creator can delete a blog' })
     }
 
@@ -58,14 +56,13 @@ router.post('/', async (request, response) => {
         })
     }
 
-    const decodedToken = jwt.verify(request.token, process.env.SECRET)
-    if (!decodedToken.id) {
+    if (!request.user) {
         return response.status(401).json({
             error: 'token missing or invalid'
         })
     }
 
-    const user = await Users.findById(decodedToken.id)
+    const user = await Users.findById(request.user)
     if (!user) {
         return response.status(400).json({
             error: 'userId missing or invalid'
