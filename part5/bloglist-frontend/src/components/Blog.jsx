@@ -28,7 +28,8 @@ const Blog = ({ blog, handleLike, handleDelete, currentUser }) => {
     marginBottom: 5
   }
 
-  const isOwner = currentUser && blog.user && blog.user.username === currentUser.username
+  const isOwner = currentUser && blog.user === currentUser.id
+  console.log('Blog user:', blog.user, 'Current user:', currentUser)
 
   return (
     <div style={blogStyle} className="blog">

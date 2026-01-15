@@ -64,6 +64,7 @@ router.put('/:id', async (request, response) => {
         return response.status(404).end()
     }
     const updatedBlog = await foundedBlog.set(blog).save()
+    await updatedBlog.populate('user', { username: 1, name: 1 })
     response.json(updatedBlog)
 })
 
@@ -96,6 +97,7 @@ router.post('/', async (request, response) => {
     const blog = new Blogs(request.body)
     blog.user = user._id
     const saveBlog = await blog.save()
+    await saveBlog.populate('user', { username: 1, name: 1 })
 
     user.blogs = user.blogs.concat(saveBlog._id)
     await user.save()

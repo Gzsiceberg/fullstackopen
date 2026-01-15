@@ -73,6 +73,27 @@ describe('blog app', () => {
       // Wait for the like count to update - re-query the blog element since it might have moved
       await expect(blogElement.locator('.blog-likes')).toContainText('likes 1')
     })
+
+    test('the user who created a blog can delete it', async ({ page }) => {
+      await createBlog(page, 'Blog to Delete', 'Delete Author', 'http://deleteurl.com')
+
+      // Find the blog and click view to see the remove button
+      const blogElement = page.locator('.blog').filter({ hasText: 'Blog to Delete' })
+      await blogElement.getByRole('button', { name: 'view' }).click()
+
+      // Set up dialog handler to accept the confirmation
+      page.on('dialog', async dialog => {
+        expect(dialog.type()).toBe('confirm')
+        expect(dialog.message()).toContain('Blog to Delete')
+        await dialog.accept()
+      })
+
+      // Click the remove button
+      await blogElement.getByRole('button', { name: 'remove' }).click()
+
+      // Verify the blog is no longer in the list
+      await expect(page.locator('.blog').filter({ hasText: 'Blog to Delete' })).not.toBeVisible()
+    })
   })
 
 })
