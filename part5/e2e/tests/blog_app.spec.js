@@ -1,5 +1,12 @@
 const { test, describe, expect, beforeEach } = require('@playwright/test')
 
+const loginWith = async (page, username, password) => {
+  await page.getByRole('button', { name: 'login' }).click()
+  await page.getByLabel('username').fill(username)
+  await page.getByLabel('password').fill(password)
+  await page.getByRole('button', { name: 'login' }).click()
+}
+
 describe('blog app', () => {
   beforeEach(async ({ page }) => {
     await page.goto('http://localhost:5173')
@@ -11,10 +18,15 @@ describe('blog app', () => {
   })
 
   test('user can log in', async ({ page }) => {
-    await page.getByRole('button', { name: 'login' }).click()
-    await page.getByLabel('username').fill('root')
-    await page.getByLabel('password').fill('sekret')
-    await page.getByRole('button', { name: 'login' }).click()
+    await loginWith(page, 'root', 'sekret')
     await expect(page.getByText('Superuser logged in')).toBeVisible()
   })
+
+  test('login fails with wrong password', async ({ page }) => {
+    await loginWith(page, 'mluukkai', 'wrong')
+    await page.getByRole('button', { name: 'login' }).click()
+
+    await expect(page.getByText('Wrong username or password')).toBeVisible()
+  })
+
 })
