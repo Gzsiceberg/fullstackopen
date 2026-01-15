@@ -19,7 +19,7 @@ const Togglable = (props) => {
   )
 }
 
-const Blog = ({ blog }) => {
+const Blog = ({ blog, handleLike }) => {
   const blogStyle = {
     paddingTop: 10,
     paddingLeft: 2,
@@ -35,7 +35,7 @@ const Blog = ({ blog }) => {
             {blog.url}
           </div>
           <div>
-            likes {blog.likes} <button>like</button>
+            likes {blog.likes} <button onClick={() => handleLike(blog)}>like</button>
           </div>
           <div>
             {blog.user.name}

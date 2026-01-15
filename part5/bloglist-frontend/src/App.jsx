@@ -116,6 +116,25 @@ const App = () => {
     }
   }
 
+  const handleLike = async (blog) => {
+    try {
+      const updatedBlog = {
+        user: blog.user.id,
+        likes: blog.likes + 1,
+        author: blog.author,
+        title: blog.title,
+        url: blog.url
+      }
+
+      const returnedBlog = await blogService.update(blog.id, updatedBlog)
+      setBlogs(blogs.map(b => b.id !== blog.id ? b : { ...returnedBlog, user: blog.user }))
+      showNotification(`You liked "${blog.title}"`, 'success')
+    } catch (exception) {
+      console.log('Error updating blog:', exception)
+      showNotification('Failed to update blog', 'error')
+    }
+  }
+
   return (
     <div>
       <Notification message={notification?.message} type={notification?.type} />
@@ -137,7 +156,7 @@ const App = () => {
           </Togglable>
           <h2>blogs</h2>
           {blogs.map(blog =>
-            <Blog key={blog.id} blog={blog} />
+            <Blog key={blog.id} blog={blog} handleLike={handleLike} />
           )}
         </>
       }

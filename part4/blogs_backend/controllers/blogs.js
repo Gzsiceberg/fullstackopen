@@ -7,13 +7,23 @@ router.get('/', async (request, response) => {
     response.json(blog)
 })
 
-router.delete('/:id', async (request, response) => {
+const checkRequest = (request, response) => {
     if (!request.token) {
-        return response.status(401).json({ error: 'token missing or invalid' })
+        response.status(401).json({ error: 'token missing or invalid' })
+        return false
     }
 
     if (!request.user) {
-        return response.status(401).json({ error: 'token missing or invalid' })
+        response.status(401).json({ error: 'token is invalid' })
+        return false
+    }
+
+    return true
+}
+
+router.delete('/:id', async (request, response) => {
+    if (!checkRequest(request, response)) {
+        return
     }
 
     const blog = await Blogs.findById(request.params.id)
@@ -30,7 +40,16 @@ router.delete('/:id', async (request, response) => {
 })
 
 router.put('/:id', async (request, response) => {
+    if (!checkRequest(request, response)) {
+        return
+    }
+
     const body = request.body
+    if (!body) {
+        return response.status(400).json({
+            error: 'request body missing'
+        })
+    }
 
     const blog = {
         title: body.title,
@@ -48,19 +67,17 @@ router.put('/:id', async (request, response) => {
 })
 
 router.post('/', async (request, response) => {
-    const body = request.body
+    if (!checkRequest(request, response)) {
+        return
+    }
 
+    const body = request.body
     if (!body) {
         return response.status(400).json({
             error: 'request body missing'
         })
     }
 
-    if (!request.user) {
-        return response.status(401).json({
-            error: 'token missing or invalid'
-        })
-    }
 
     const user = await Users.findById(request.user)
     if (!user) {
