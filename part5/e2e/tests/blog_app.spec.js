@@ -9,12 +9,13 @@ const loginWith = async (page, username, password) => {
 
 describe('blog app', () => {
   beforeEach(async ({ page }) => {
-    await page.goto('http://localhost:5173')
+    await page.goto('/')
   })
 
   test('front page can be opened', async ({ page }) => {
     await expect(page.getByLabel('username')).toBeVisible()
     await expect(page.getByLabel('password')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'login' })).toBeVisible()
   })
 
   test('user can log in', async ({ page }) => {
