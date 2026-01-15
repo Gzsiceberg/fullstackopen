@@ -147,7 +147,14 @@ const App = () => {
       showNotification(`Blog "${blog.title}" removed`, 'success')
     } catch (exception) {
       console.log('Error deleting blog:', exception)
-      showNotification('Failed to delete blog', 'error')
+      if (exception.response?.status === 401) {
+        window.localStorage.removeItem('loggedBlogappUser')
+        blogService.setToken(null)
+        setUser(null)
+        showNotification('Session expired. Please login again', 'error')
+      } else {
+        showNotification('Failed to delete blog', 'error')
+      }
     }
   }
 
