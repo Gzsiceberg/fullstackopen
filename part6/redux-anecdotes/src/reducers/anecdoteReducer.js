@@ -11,9 +11,9 @@ const anecdoteSlice = createSlice({
       state.push(action.payload)
     },
     updateAnecdote(state, action) {
-      const newAnecdote = action.payload
+      const updated = action.payload
       return state.map(anecdote =>
-        anecdote.id === newAnecdote.id ? newAnecdote : anecdote
+        anecdote.id === updated.id ? updated : anecdote
       )
     },
     setAnecdotes(state, action) {
