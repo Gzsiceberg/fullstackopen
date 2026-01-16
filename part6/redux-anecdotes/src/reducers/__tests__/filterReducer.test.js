@@ -6,17 +6,17 @@ describe('filterReducer', () => {
   test('returns initial state', () => {
     const state = undefined
     const action = {
-      type: 'DO_NOTHING'
+      type: 'filter/default'
     }
 
     const newState = filterReducer(state, action)
     expect(newState).toBe('')
   })
 
-  test('changes filter with action SET_FILTER', () => {
+  test('changes filter with action filter/setFilter', () => {
     const state = ''
     const action = {
-      type: 'SET_FILTER',
+      type: 'filter/setFilter',
       payload: 'all'
     }
 
