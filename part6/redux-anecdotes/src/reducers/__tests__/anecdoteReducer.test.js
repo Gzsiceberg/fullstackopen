@@ -1,22 +1,17 @@
-import anecdoteReducer from '../anecdoteReducer'
+import anecdoteReducer, { createAnecdote, voteAnecdote } from '../anecdoteReducer'
 import deepFreeze from 'deep-freeze'
 import { describe, test, expect } from 'vitest'
 
 describe('anecdoteReducer', () => {
   test('returns new state with action NEW_ANECDOTE', () => {
     const state = []
-    const action = {
-      type: 'NEW_ANECDOTE',
-      data: {
-        content: 'the app state is stored in a single store'
-      }
-    }
+    const action = createAnecdote('the app state is stored in a single store')
 
     deepFreeze(state)
     const newState = anecdoteReducer(state, action)
 
     expect(newState).toHaveLength(1)
-    expect(newState.map(s => s.content)).toContain(action.data.content)
+    expect(newState.map(s => s.content)).toContain('the app state is stored in a single store')
   })
 
   test('returns new state with action VOTE', () => {
@@ -33,10 +28,7 @@ describe('anecdoteReducer', () => {
       }
     ]
 
-    const action = {
-      type: 'VOTE',
-      data: { id: '1' }
-    }
+    const action = voteAnecdote('1')
 
     deepFreeze(state)
     const newState = anecdoteReducer(state, action)
