@@ -1,14 +1,7 @@
 import AnecdoteForm from './components/AnecdoteForm'
 import Notification from './components/Notification'
 import { useQuery } from '@tanstack/react-query'
-
-const getAnecdotes = async () => {
-  const response = await fetch('http://localhost:3001/anecdotes')
-  if (!response.ok) {
-    throw new Error('Network response was not ok')
-  }
-  return response.json()
-}
+import { getAnecdotes } from './services/anecdotes'
 
 const App = () => {
   const handleVote = (anecdote) => {
@@ -22,7 +15,7 @@ const App = () => {
     retry: false
   })
 
-  console.log(result)
+
   if (result.isPending) {
     return <div>loading data...</div>
   }
