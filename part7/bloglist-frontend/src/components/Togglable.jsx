@@ -1,5 +1,6 @@
 import { useState, useImperativeHandle } from 'react'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 
 const Togglable = (props) => {
   const [visible, setVisible] = useState(false)
@@ -13,15 +14,21 @@ const Togglable = (props) => {
   })
 
   return (
-    <div className="space-y-4">
+    <div>
       {!visible && (
-        <Button onClick={toggleVisibility}>{props.buttonLabel}</Button>
+        <Button size="lg" onClick={toggleVisibility}>
+          + {props.buttonLabel}
+        </Button>
       )}
       {visible && (
-        <div className="space-y-4">
-          {props.children}
-          <Button variant="outline" onClick={toggleVisibility}>Cancel</Button>
-        </div>
+        <Card>
+          <CardContent className="pt-6 space-y-4">
+            {props.children}
+            <Button variant="outline" onClick={toggleVisibility}>
+              Cancel
+            </Button>
+          </CardContent>
+        </Card>
       )}
     </div>
   )
