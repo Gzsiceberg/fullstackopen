@@ -2,6 +2,7 @@ import js from '@eslint/js'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
+import eslintConfigPrettier from 'eslint-config-prettier'
 
 export default [
   { ignores: ['dist'] },
@@ -27,16 +28,8 @@ export default [
       'react-refresh/only-export-components': [
         'warn',
         { allowConstantExport: true }
-
       ],
-      indent: ['error', 2],
-      'linebreak-style': ['error', 'unix'],
-      quotes: ['error', 'single'],
-      semi: ['error', 'never'],
       eqeqeq: 'error',
-      'no-trailing-spaces': 'error',
-      'object-curly-spacing': ['error', 'always'],
-      'arrow-spacing': ['error', { before: true, after: true }],
       'no-console': 'off'
     }
   },
@@ -47,5 +40,6 @@ export default [
         ...globals.vitest
       }
     }
-  }
+  },
+  eslintConfigPrettier
 ]
