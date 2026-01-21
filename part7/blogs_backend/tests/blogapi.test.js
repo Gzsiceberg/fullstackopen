@@ -248,6 +248,7 @@ describe('updating a blog', () => {
 
         const response = await api
             .put(`/api/blogs/${blogToUpdate.id}`)
+            .set('Authorization', `Bearer ${token}`)
             .send(updatedData)
             .expect(200)
             .expect('Content-Type', /application\/json/)
@@ -267,12 +268,61 @@ describe('updating a blog', () => {
 
         await api
             .put(`/api/blogs/${blogToUpdate.id}`)
+            .set('Authorization', `Bearer ${token}`)
             .send(updatedData)
             .expect(200)
 
         const blogsAtEnd = await api.get('/api/blogs')
         const updatedBlog = blogsAtEnd.body.find(blog => blog.id === blogToUpdate.id)
         assert(updatedBlog.likes === originalLikes + 1)
+    })
+
+    test('updating a blog does not change its creator', async () => {
+        // Create a new user (User B)
+        const passwordHash = await bcrypt.hash('userbpassword', 10)
+        const userB = new Users({
+            username: 'userb',
+            name: 'User B',
+            passwordHash
+        })
+        await userB.save()
+
+        // Login as User B
+        const loginResponse = await api
+            .post('/api/login')
+            .send({ username: 'userb', password: 'userbpassword' })
+
+        const tokenB = loginResponse.body.token
+
+        // User B updates a blog created by default test user (User A)
+        const blogsAtStart = await api.get('/api/blogs')
+        const blogToUpdate = blogsAtStart.body[0]
+
+        // Verify initial owner is NOT User B
+        assert(blogToUpdate.user.username !== 'userb')
+
+        const updatedData = {
+            ...blogToUpdate,
+            likes: blogToUpdate.likes + 1
+        }
+
+        const response = await api
+            .put(`/api/blogs/${blogToUpdate.id}`)
+            .set('Authorization', `Bearer ${tokenB}`)
+            .send(updatedData)
+            .expect(200)
+
+        // Verify the user field in the response is still the original owner
+        // Note: The response populates user with { username: 1, name: 1 }
+        assert(response.body.user.username === blogToUpdate.user.username)
+        assert(response.body.user.username !== 'userb')
+
+        // Double check by fetching from DB
+        const blogsAtEnd = await api.get('/api/blogs')
+        const updatedBlog = blogsAtEnd.body.find(blog => blog.id === blogToUpdate.id)
+
+        assert(updatedBlog.user.username === blogToUpdate.user.username)
+        assert(updatedBlog.user.username !== 'userb')
     })
 })
 
