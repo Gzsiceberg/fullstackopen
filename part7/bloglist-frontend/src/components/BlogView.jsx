@@ -4,6 +4,12 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { likeBlog, deleteBlog, addComment } from '../reducers/blogsReducer'
 import { showNotification } from '../reducers/notificationReducer'
 import { logoutUser } from '../reducers/userReducer'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import { MessageCircle } from 'lucide-react'
 
 const BlogView = () => {
   const { id } = useParams()
@@ -81,19 +87,59 @@ const BlogView = () => {
       </div>
       <div>added by {blog.user ? blog.user.name : 'unknown'}</div>
       {isOwner && <button onClick={handleDelete}>remove</button>}
-      <h3>comments</h3>
-      <form onSubmit={handleComment}>
-        <input
-          type="text"
-          value={comment}
-          onChange={({ target }) => setComment(target.value)}
-        />
-        <button type="submit">add comment</button>
-      </form>
-      <ul>
-        {blog.comments &&
-          blog.comments.map((c, index) => <li key={index}>{c}</li>)}
-      </ul>
+
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <MessageCircle className="h-5 w-5" />
+            Comments
+            {blog.comments && blog.comments.length > 0 && (
+              <Badge variant="secondary">{blog.comments.length}</Badge>
+            )}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <form onSubmit={handleComment} className="flex gap-3">
+            <Input
+              type="text"
+              value={comment}
+              onChange={({ target }) => setComment(target.value)}
+              placeholder="Write a comment..."
+              className="flex-1"
+            />
+            <Button type="submit" disabled={!comment.trim()}>
+              Add Comment
+            </Button>
+          </form>
+
+          {blog.comments && blog.comments.length > 0 ? (
+            <div className="space-y-3">
+              {blog.comments.map((c, index) => (
+                <Card key={index} className="py-3">
+                  <CardContent className="flex items-start gap-3">
+                    <Avatar>
+                      <AvatarFallback>
+                        {String.fromCharCode(65 + (index % 26))}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1 space-y-1">
+                      <p className="text-sm">{c}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Comment #{index + 1}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              <MessageCircle className="h-12 w-12 mx-auto mb-3 opacity-50" />
+              <p>No comments yet. Be the first to comment!</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }
