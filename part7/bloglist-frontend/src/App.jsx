@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
+import { useDispatch } from 'react-redux'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Togglable from './components/Togglable'
-import { useRef } from 'react'
+import { showNotification } from './reducers/notificationReducer'
 
 const LoginForm = ({ username, password, handleLogin, setUsername, setPassword }) => {
   return (
@@ -43,14 +44,8 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [notification, setNotification] = useState(null)
 
-  const showNotification = (message, type = 'success') => {
-    setNotification({ message, type })
-    setTimeout(() => {
-      setNotification(null)
-    }, 5000)
-  }
+  const dispatch = useDispatch()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -88,10 +83,10 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
-      showNotification(`Welcome ${user.name}!`, 'success')
+      dispatch(showNotification(`Welcome ${user.name}!`, 'success'))
     } catch {
       console.log('Wrong credentials')
-      showNotification('Wrong username or password', 'error')
+      dispatch(showNotification('Wrong username or password', 'error'))
     }
   }
 
@@ -99,7 +94,7 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     setUser(null)
     blogService.setToken(null)
-    showNotification('Logged out successfully', 'success')
+    dispatch(showNotification('Logged out successfully', 'success'))
   }
 
   const blogFormRef = useRef()
@@ -109,10 +104,10 @@ const App = () => {
       const returnedBlog = await blogService.create(blogObject)
       setBlogs(blogs.concat(returnedBlog))
       blogFormRef.current.toggleVisibility()
-      showNotification(`A new blog "${returnedBlog.title}" by ${returnedBlog.author} added`, 'success')
+      dispatch(showNotification(`A new blog "${returnedBlog.title}" by ${returnedBlog.author} added`, 'success'))
     } catch (exception) {
       console.log('Error creating blog:', exception)
-      showNotification('Failed to create blog', 'error')
+      dispatch(showNotification('Failed to create blog', 'error'))
     }
   }
 
@@ -130,7 +125,7 @@ const App = () => {
       // showNotification(`You liked "${blog.title}"`, 'success')
     } catch (exception) {
       console.log('Error updating blog:', exception)
-      showNotification('Failed to update blog', 'error')
+      dispatch(showNotification('Failed to update blog', 'error'))
     }
   }
 
@@ -144,16 +139,16 @@ const App = () => {
     try {
       await blogService.remove(blog.id)
       setBlogs(blogs.filter(b => b.id !== blog.id))
-      showNotification(`Blog "${blog.title}" removed`, 'success')
+      dispatch(showNotification(`Blog "${blog.title}" removed`, 'success'))
     } catch (exception) {
       console.log('Error deleting blog:', exception)
       if (exception.response?.status === 401) {
         window.localStorage.removeItem('loggedBlogappUser')
         blogService.setToken(null)
         setUser(null)
-        showNotification('Session expired. Please login again', 'error')
+        dispatch(showNotification('Session expired. Please login again', 'error'))
       } else {
-        showNotification('Failed to delete blog', 'error')
+        dispatch(showNotification('Failed to delete blog', 'error'))
       }
     }
   }
@@ -162,7 +157,7 @@ const App = () => {
 
   return (
     <div>
-      <Notification message={notification?.message} type={notification?.type} />
+      <Notification />
       {!user &&
         <LoginForm
           username={username}
