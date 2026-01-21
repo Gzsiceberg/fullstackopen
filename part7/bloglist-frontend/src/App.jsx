@@ -3,17 +3,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Routes, Route } from 'react-router-dom'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
+import BlogView from './components/BlogView'
 import Notification from './components/Notification'
 import Users from './components/Users'
 import User from './components/User'
 import Togglable from './components/Togglable'
 import { showNotification } from './reducers/notificationReducer'
-import {
-  initializeBlogs,
-  createBlog,
-  likeBlog,
-  deleteBlog
-} from './reducers/blogsReducer'
+import { initializeBlogs, createBlog } from './reducers/blogsReducer'
 import { initializeUser, loginUser, logoutUser } from './reducers/userReducer'
 import { initializeUsers } from './reducers/usersReducer'
 
@@ -105,40 +101,6 @@ const App = () => {
     }
   }
 
-  const handleLike = async (blog) => {
-    try {
-      await dispatch(likeBlog(blog))
-    } catch (exception) {
-      console.log('Error updating blog:', exception)
-      dispatch(showNotification('Failed to update blog', 'error'))
-    }
-  }
-
-  const handleDelete = async (blog) => {
-    const confirmDelete = window.confirm(
-      `Remove blog "${blog.title}" by ${blog.author}?`
-    )
-
-    if (!confirmDelete) {
-      return
-    }
-
-    try {
-      await dispatch(deleteBlog(blog.id))
-      dispatch(showNotification(`Blog "${blog.title}" removed`, 'success'))
-    } catch (exception) {
-      console.log('Error deleting blog:', exception)
-      if (exception.response?.status === 401) {
-        dispatch(logoutUser())
-        dispatch(
-          showNotification('Session expired. Please login again', 'error')
-        )
-      } else {
-        dispatch(showNotification('Failed to delete blog', 'error'))
-      }
-    }
-  }
-
   const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes)
 
   const Home = () => (
@@ -150,13 +112,7 @@ const App = () => {
           </Togglable>
           <h2>blogs</h2>
           {sortedBlogs.map((blog) => (
-            <Blog
-              key={blog.id}
-              blog={blog}
-              handleLike={handleLike}
-              handleDelete={handleDelete}
-              currentUser={user}
-            />
+            <Blog key={blog.id} blog={blog} />
           ))}
         </>
       )}
@@ -184,6 +140,7 @@ const App = () => {
 
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/blogs/:id" element={<BlogView />} />
         <Route path="/users" element={<Users />} />
         <Route path="/users/:id" element={<User />} />
       </Routes>
