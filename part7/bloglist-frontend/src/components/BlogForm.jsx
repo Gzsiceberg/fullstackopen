@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 const BlogForm = ({ createBlog }) => {
   const [title, setTitle] = useState('')
@@ -19,45 +22,43 @@ const BlogForm = ({ createBlog }) => {
   }
 
   return (
-    <div>
-      <h2>create new</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>
-            title:
-            <input
+    <Card>
+      <CardHeader>
+        <CardTitle>Create New Blog</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Title</label>
+            <Input
               type="text"
               value={title}
               onChange={({ target }) => setTitle(target.value)}
-              placeholder="enter blog title"
+              placeholder="Enter blog title"
             />
-          </label>
-        </div>
-        <div>
-          <label>
-            author:
-            <input
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Author</label>
+            <Input
               type="text"
               value={author}
               onChange={({ target }) => setAuthor(target.value)}
-              placeholder="enter blog author"
+              placeholder="Enter blog author"
             />
-          </label>
-        </div>
-        <div>
-          <label>
-            url:
-            <input
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">URL</label>
+            <Input
               type="text"
               value={url}
               onChange={({ target }) => setUrl(target.value)}
-              placeholder="enter blog url"
+              placeholder="Enter blog URL"
             />
-          </label>
-        </div>
-        <button type="submit">create</button>
-      </form>
-    </div>
+          </div>
+          <Button type="submit">Create</Button>
+        </form>
+      </CardContent>
+    </Card>
   )
 }
 

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Link } from 'react-router-dom'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import BlogView from './components/BlogView'
@@ -12,6 +12,9 @@ import { showNotification } from './reducers/notificationReducer'
 import { initializeBlogs, createBlog } from './reducers/blogsReducer'
 import { initializeUser, loginUser, logoutUser } from './reducers/userReducer'
 import { initializeUsers } from './reducers/usersReducer'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 const LoginForm = ({
   username,
@@ -21,32 +24,32 @@ const LoginForm = ({
   setPassword
 }) => {
   return (
-    <>
-      <h2>Login</h2>
-      <form onSubmit={handleLogin}>
-        <div>
-          <label>
-            username
-            <input
+    <Card className="max-w-md mx-auto mt-10">
+      <CardHeader>
+        <CardTitle>Login</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleLogin} className="space-y-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Username</label>
+            <Input
               type="text"
               value={username}
               onChange={({ target }) => setUsername(target.value)}
             />
-          </label>
-        </div>
-        <div>
-          <label>
-            password
-            <input
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Password</label>
+            <Input
               type="password"
               value={password}
               onChange={({ target }) => setPassword(target.value)}
             />
-          </label>
-        </div>
-        <button type="submit">login</button>
-      </form>
-    </>
+          </div>
+          <Button type="submit" className="w-full">Login</Button>
+        </form>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -106,44 +109,58 @@ const App = () => {
   const Home = () => (
     <>
       {user && (
-        <>
-          <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+        <div className="space-y-4">
+          <Togglable buttonLabel="Create New Blog" ref={blogFormRef}>
             <BlogForm createBlog={addBlog} />
           </Togglable>
-          <h2>blogs</h2>
-          {sortedBlogs.map((blog) => (
-            <Blog key={blog.id} blog={blog} />
-          ))}
-        </>
+          <h2 className="text-xl font-semibold">Blogs</h2>
+          <div className="space-y-2">
+            {sortedBlogs.map((blog) => (
+              <Blog key={blog.id} blog={blog} />
+            ))}
+          </div>
+        </div>
       )}
     </>
   )
 
   return (
-    <div>
-      <Notification />
-      {!user && (
-        <LoginForm
-          username={username}
-          password={password}
-          handleLogin={handleLogin}
-          setUsername={setUsername}
-          setPassword={setPassword}
-        />
-      )}
-
+    <div className="min-h-screen bg-background">
       {user && (
-        <p>
-          {user.name} logged in <button onClick={handleLogout}>logout</button>
-        </p>
+        <nav className="border-b bg-card">
+          <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <Link to="/" className="text-lg font-bold">Blog App</Link>
+              <Link to="/" className="text-muted-foreground hover:text-foreground">Blogs</Link>
+              <Link to="/users" className="text-muted-foreground hover:text-foreground">Users</Link>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-sm text-muted-foreground">{user.name} logged in</span>
+              <Button variant="outline" size="sm" onClick={handleLogout}>Logout</Button>
+            </div>
+          </div>
+        </nav>
       )}
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/blogs/:id" element={<BlogView />} />
-        <Route path="/users" element={<Users />} />
-        <Route path="/users/:id" element={<User />} />
-      </Routes>
+      <main className="max-w-4xl mx-auto px-4 py-6">
+        <Notification />
+        {!user && (
+          <LoginForm
+            username={username}
+            password={password}
+            handleLogin={handleLogin}
+            setUsername={setUsername}
+            setPassword={setPassword}
+          />
+        )}
+
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/blogs/:id" element={<BlogView />} />
+          <Route path="/users" element={<Users />} />
+          <Route path="/users/:id" element={<User />} />
+        </Routes>
+      </main>
     </div>
   )
 }

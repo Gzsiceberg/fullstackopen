@@ -1,18 +1,18 @@
 import { Link } from 'react-router-dom'
+import { Card, CardContent } from '@/components/ui/card'
 
 const Blog = ({ blog }) => {
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5
-  }
-
   return (
-    <div style={blogStyle} className="blog">
-      <Link to={`/blogs/${blog.id}`}>{blog.title} {blog.author}</Link> 
-    </div>
+    <Card className="blog">
+      <CardContent className="py-3">
+        <Link 
+          to={`/blogs/${blog.id}`} 
+          className="text-primary hover:underline"
+        >
+          {blog.title} - {blog.author}
+        </Link>
+      </CardContent>
+    </Card>
   )
 }
 

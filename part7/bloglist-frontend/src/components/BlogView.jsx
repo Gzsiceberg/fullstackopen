@@ -7,9 +7,7 @@ import { logoutUser } from '../reducers/userReducer'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { MessageCircle } from 'lucide-react'
 
 const BlogView = () => {
   const { id } = useParams()
@@ -21,7 +19,7 @@ const BlogView = () => {
   const user = useSelector((state) => state.user)
 
   if (!blog) {
-    return <div>Blog not found</div>
+    return <div className="text-muted-foreground">Blog not found</div>
   }
 
   const isOwner = user && blog.user && blog.user.username === user.username
@@ -73,32 +71,46 @@ const BlogView = () => {
   }
 
   return (
-    <div>
-      <h2>
-        {blog.title} {blog.author}
-      </h2>
-      <div>
-        <a href={blog.url} target="_blank" rel="noopener noreferrer">
-          {blog.url}
-        </a>
-      </div>
-      <div>
-        {blog.likes} likes <button onClick={handleLike}>like</button>
-      </div>
-      <div>added by {blog.user ? blog.user.name : 'unknown'}</div>
-      {isOwner && <button onClick={handleDelete}>remove</button>}
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>{blog.title}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-muted-foreground">by {blog.author}</p>
+          <a 
+            href={blog.url} 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-primary hover:underline block"
+          >
+            {blog.url}
+          </a>
+          <div className="flex items-center gap-2">
+            <Badge variant="secondary">{blog.likes} likes</Badge>
+            <Button size="sm" onClick={handleLike}>Like</Button>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Added by {blog.user ? blog.user.name : 'unknown'}
+          </p>
+          {isOwner && (
+            <Button variant="destructive" size="sm" onClick={handleDelete}>
+              Remove
+            </Button>
+          )}
+        </CardContent>
+      </Card>
 
-      <Card className="mt-8">
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <MessageCircle className="h-5 w-5" />
             Comments
             {blog.comments && blog.comments.length > 0 && (
               <Badge variant="secondary">{blog.comments.length}</Badge>
             )}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-4">
           <form onSubmit={handleComment} className="flex gap-3">
             <Input
               type="text"
@@ -113,30 +125,17 @@ const BlogView = () => {
           </form>
 
           {blog.comments && blog.comments.length > 0 ? (
-            <div className="space-y-3">
+            <ul className="space-y-2">
               {blog.comments.map((c, index) => (
-                <Card key={index} className="py-3">
-                  <CardContent className="flex items-start gap-3">
-                    <Avatar>
-                      <AvatarFallback>
-                        {String.fromCharCode(65 + (index % 26))}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 space-y-1">
-                      <p className="text-sm">{c}</p>
-                      <p className="text-xs text-muted-foreground">
-                        Comment #{index + 1}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
+                <li key={index} className="p-3 bg-muted rounded-md">
+                  {c}
+                </li>
               ))}
-            </div>
+            </ul>
           ) : (
-            <div className="text-center py-8 text-muted-foreground">
-              <MessageCircle className="h-12 w-12 mx-auto mb-3 opacity-50" />
-              <p>No comments yet. Be the first to comment!</p>
-            </div>
+            <p className="text-center py-4 text-muted-foreground">
+              No comments yet. Be the first to comment!
+            </p>
           )}
         </CardContent>
       </Card>

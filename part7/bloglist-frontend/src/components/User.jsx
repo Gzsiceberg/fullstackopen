@@ -1,5 +1,6 @@
 import { useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 const User = () => {
   const { id } = useParams()
@@ -11,14 +12,20 @@ const User = () => {
   }
 
   return (
-    <div>
-      <h2>{user.name}</h2>
-      <h3>added blogs</h3>
-      <ul>
-        {user.blogs &&
-          user.blogs.map((blog) => <li key={blog.id}>{blog.title}</li>)}
-      </ul>
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>{user.name}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <h3 className="font-medium mb-2">Added Blogs</h3>
+        <ul className="list-disc list-inside space-y-1">
+          {user.blogs &&
+            user.blogs.map((blog) => (
+              <li key={blog.id} className="text-muted-foreground">{blog.title}</li>
+            ))}
+        </ul>
+      </CardContent>
+    </Card>
   )
 }
 
