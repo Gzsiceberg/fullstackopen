@@ -3,8 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
-import blogService from './services/blogs'
-import loginService from './services/login'
+
 import Togglable from './components/Togglable'
 import { showNotification } from './reducers/notificationReducer'
 import {
@@ -13,6 +12,7 @@ import {
   likeBlog,
   deleteBlog
 } from './reducers/blogsReducer'
+import { initializeUser, loginUser, logoutUser } from './reducers/userReducer'
 
 const LoginForm = ({
   username,
@@ -54,45 +54,24 @@ const LoginForm = ({
 const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
 
   const dispatch = useDispatch()
   const blogs = useSelector((state) => state.blogs)
+  const user = useSelector((state) => state.user)
 
   useEffect(() => {
     dispatch(initializeBlogs())
+    dispatch(initializeUser())
   }, [dispatch])
-
-  useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
-    if (loggedUserJSON) {
-      try {
-        const user = JSON.parse(loggedUserJSON)
-        if (user && user.token) {
-          setUser(user)
-          blogService.setToken(user.token)
-        }
-      } catch {
-        window.localStorage.removeItem('loggedBlogappUser')
-      }
-    }
-  }, [])
 
   const handleLogin = async (event) => {
     event.preventDefault()
     console.log('logging in with', username, password)
     try {
-      const user = await loginService.login({
-        username,
-        password
-      })
-
-      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
-      blogService.setToken(user.token)
-      setUser(user)
+      const loggedUser = await dispatch(loginUser({ username, password }))
       setUsername('')
       setPassword('')
-      dispatch(showNotification(`Welcome ${user.name}!`, 'success'))
+      dispatch(showNotification(`Welcome ${loggedUser.name}!`, 'success'))
     } catch {
       console.log('Wrong credentials')
       dispatch(showNotification('Wrong username or password', 'error'))
@@ -100,9 +79,7 @@ const App = () => {
   }
 
   const handleLogout = () => {
-    window.localStorage.removeItem('loggedBlogappUser')
-    setUser(null)
-    blogService.setToken(null)
+    dispatch(logoutUser())
     dispatch(showNotification('Logged out successfully', 'success'))
   }
 
@@ -148,9 +125,7 @@ const App = () => {
     } catch (exception) {
       console.log('Error deleting blog:', exception)
       if (exception.response?.status === 401) {
-        window.localStorage.removeItem('loggedBlogappUser')
-        blogService.setToken(null)
-        setUser(null)
+        dispatch(logoutUser())
         dispatch(
           showNotification('Session expired. Please login again', 'error')
         )
