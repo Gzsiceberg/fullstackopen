@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { Routes, Route } from 'react-router-dom'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import Notification from './components/Notification'
-
+import Users from './components/Users'
+import User from './components/User'
 import Togglable from './components/Togglable'
 import { showNotification } from './reducers/notificationReducer'
 import {
@@ -13,6 +15,7 @@ import {
   deleteBlog
 } from './reducers/blogsReducer'
 import { initializeUser, loginUser, logoutUser } from './reducers/userReducer'
+import { initializeUsers } from './reducers/usersReducer'
 
 const LoginForm = ({
   username,
@@ -62,6 +65,7 @@ const App = () => {
   useEffect(() => {
     dispatch(initializeBlogs())
     dispatch(initializeUser())
+    dispatch(initializeUsers())
   }, [dispatch])
 
   const handleLogin = async (event) => {
@@ -137,24 +141,10 @@ const App = () => {
 
   const sortedBlogs = [...blogs].sort((a, b) => b.likes - a.likes)
 
-  return (
-    <div>
-      <Notification />
-      {!user && (
-        <LoginForm
-          username={username}
-          password={password}
-          handleLogin={handleLogin}
-          setUsername={setUsername}
-          setPassword={setPassword}
-        />
-      )}
-
+  const Home = () => (
+    <>
       {user && (
         <>
-          <p>
-            {user.name} logged in <button onClick={handleLogout}>logout</button>
-          </p>
           <Togglable buttonLabel="create new blog" ref={blogFormRef}>
             <BlogForm createBlog={addBlog} />
           </Togglable>
@@ -170,6 +160,33 @@ const App = () => {
           ))}
         </>
       )}
+    </>
+  )
+
+  return (
+    <div>
+      <Notification />
+      {!user && (
+        <LoginForm
+          username={username}
+          password={password}
+          handleLogin={handleLogin}
+          setUsername={setUsername}
+          setPassword={setPassword}
+        />
+      )}
+
+      {user && (
+        <p>
+          {user.name} logged in <button onClick={handleLogout}>logout</button>
+        </p>
+      )}
+
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/users" element={<Users />} />
+        <Route path="/users/:id" element={<User />} />
+      </Routes>
     </div>
   )
 }
