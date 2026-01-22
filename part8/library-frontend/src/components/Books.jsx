@@ -12,14 +12,15 @@ const Books = (props) => {
   const filteredBooksResult = useQuery(ALL_BOOKS, {
     variables: { genre },
     skip: !props.show,
-    fetchPolicy: 'cache-and-network' // Ensure we get fresh data when props.show changes or genre changes
+    fetchPolicy: 'cache-and-network'
   })
 
   if (!props.show) {
     return null
   }
 
-  if (filteredBooksResult.loading || allBooksResult.loading) {
+  // Only show loading if we don't have data yet
+  if ((filteredBooksResult.loading && !filteredBooksResult.data) || allBooksResult.loading) {
     return <div>loading...</div>
   }
 
