@@ -1,9 +1,22 @@
 import { ApolloClient, gql, HttpLink, InMemoryCache } from '@apollo/client'
+import { setContext } from '@apollo/client/link/context'
+
+const authLink = setContext((_, { headers }) => {
+  const token = localStorage.getItem('library-user-token')
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : null,
+    }
+  }
+})
+
+const httpLink = new HttpLink({
+  uri: 'http://localhost:4000',
+})
 
 export const client = new ApolloClient({
-  link: new HttpLink({
-    uri: 'http://localhost:4000',
-  }),
+  link: authLink.concat(httpLink),
   cache: new InMemoryCache(),
 })
 
@@ -56,6 +69,14 @@ export const ADD_BOOK = gql`
       }
       genres
       id
+    }
+  }
+`
+
+export const LOGIN = gql`
+  mutation login($username: String!, $password: String!) {
+    login(username: $username, password: $password) {
+      value
     }
   }
 `
