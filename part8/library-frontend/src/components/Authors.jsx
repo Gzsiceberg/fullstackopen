@@ -1,6 +1,6 @@
 import { useQuery, useMutation } from '@apollo/client/react'
 import { ALL_AUTHORS, EDIT_AUTHOR } from '../queries'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 const Authors = (props) => {
   const authorsResult = useQuery(ALL_AUTHORS)
@@ -12,12 +12,6 @@ const Authors = (props) => {
     skip: !props.show,
     cache: 'cache-and-network'
   })
-
-  useEffect(() => {
-    if (authorsResult.data && authorsResult.data.allAuthors.length > 0 && !name) {
-      setName(authorsResult.data.allAuthors[0].name)
-    }
-  }, [authorsResult.data, name])
 
   if (!props.show) {
     return null
@@ -32,12 +26,14 @@ const Authors = (props) => {
   }
 
   const authors = authorsResult.data.allAuthors
+  // Derive selected name: use state if set, otherwise default to first author
+  const selectedName = name || (authors.length > 0 ? authors[0].name : '')
 
   const submit = async (event) => {
     event.preventDefault()
 
     console.log('update author...')
-    await editAuthor({ variables: { name, setBornTo: parseInt(born) } })
+    await editAuthor({ variables: { name: selectedName, setBornTo: parseInt(born) } })
 
     setName('')
     setBorn('')
@@ -69,7 +65,7 @@ const Authors = (props) => {
           <form onSubmit={submit}>
             <div>
               name
-              <select value={name} onChange={({ target }) => setName(target.value)}>
+              <select value={selectedName} onChange={({ target }) => setName(target.value)}>
                 {authors.map((a) => (
                   <option key={a.id} value={a.name}>
                     {a.name}
