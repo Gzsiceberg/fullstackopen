@@ -8,7 +8,8 @@ const Authors = (props) => {
   const [born, setBorn] = useState('')
 
   const [editAuthor] = useMutation(EDIT_AUTHOR, {
-    refetchQueries: [{ query: ALL_AUTHORS }]
+    refetchQueries: [{ query: ALL_AUTHORS }],
+    skip: !props.show
   })
 
   useEffect(() => {
