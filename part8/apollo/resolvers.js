@@ -32,11 +32,7 @@ const resolvers = {
       return Book.find({ author: author._id, genres: args.genre }).populate('author')
     }
   },
-  Author: {
-    bookCount: async (parent) => {
-      return Book.countDocuments({ author: parent._id })
-    }
-  },
+
   Book: {
     author: async (root) => {
       // If author is already populated (it's an object with a name), return it
@@ -61,7 +57,7 @@ const resolvers = {
 
       let author = await Author.findOne({ name: args.author })
       if (!author) {
-        author = new Author({ name: args.author })
+        author = new Author({ name: args.author, bookCount: 0 })
         try {
           await author.save()
         } catch (error) {
@@ -78,6 +74,9 @@ const resolvers = {
 
       try {
         await book.save()
+        // Increment the author's bookCount
+        author.bookCount = (author.bookCount || 0) + 1
+        await author.save()
       } catch (error) {
         throw new GraphQLError('Saving book failed', {
           extensions: {
