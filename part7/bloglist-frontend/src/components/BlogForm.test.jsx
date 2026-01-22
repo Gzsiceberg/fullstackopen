@@ -10,10 +10,10 @@ describe('<BlogForm />', () => {
     render(<BlogForm createBlog={createBlog} />)
 
     // Find input fields by placeholder text
-    const titleInput = screen.getByPlaceholderText('enter blog title')
-    const authorInput = screen.getByPlaceholderText('enter blog author')
-    const urlInput = screen.getByPlaceholderText('enter blog url')
-    const submitButton = screen.getByText('create')
+    const titleInput = screen.getByPlaceholderText('Enter blog title')
+    const authorInput = screen.getByPlaceholderText('Enter blog author')
+    const urlInput = screen.getByPlaceholderText('Enter blog URL')
+    const submitButton = screen.getByText('Create')
 
     // Fill in the form
     await user.type(titleInput, 'Test Blog Title')

@@ -13,33 +13,36 @@ describe('<Togglable />', () => {
   })
 
   test('renders its children', () => {
-    screen.getByText('togglable content')
+    const button = screen.getByRole('button', { name: /\+ show/ })
+    expect(button).toBeInTheDocument()
   })
 
   test('at start the children are not displayed', () => {
-    const element = screen.getByText('togglable content')
-    expect(element).not.toBeVisible()
+    const element = screen.queryByText('togglable content')
+    expect(element).not.toBeInTheDocument()
   })
 
   test('after clicking the button, children are displayed', async () => {
     const user = userEvent.setup()
-    const button = screen.getByText('show...')
+    const button = screen.getByRole('button', { name: /\+ show/ })
     await user.click(button)
 
     const element = screen.getByText('togglable content')
-    expect(element).toBeVisible()
+    expect(element).toBeInTheDocument()
   })
 
   test('toggled content can be closed', async () => {
     const user = userEvent.setup()
-    const button = screen.getByText('show...')
+    const button = screen.getByRole('button', { name: /\+ show/ })
     await user.click(button)
 
-    const closeButton = screen.getByText('cancel')
+    const element = screen.getByText('togglable content')
+    expect(element).toBeInTheDocument()
+
+    const closeButton = screen.getByRole('button', { name: /cancel/i })
     await user.click(closeButton)
 
-    const element = screen.getByText('togglable content')
-    expect(element).not.toBeVisible()
+    expect(screen.queryByText('togglable content')).not.toBeInTheDocument()
   })
 })
 
@@ -64,13 +67,13 @@ describe('<Togglable /> useImperativeHandle', () => {
 
     render(<TestComponent />)
 
-    const element = screen.getByText('togglable content')
-    expect(element).not.toBeVisible()
+    expect(screen.queryByText('togglable content')).not.toBeInTheDocument()
 
     const parentButton = screen.getByText('toggle from parent')
     await user.click(parentButton)
 
-    expect(element).toBeVisible()
+    const element = screen.getByText('togglable content')
+    expect(element).toBeInTheDocument()
   })
 
   test('toggleVisibility method toggles visibility multiple times', async () => {
@@ -93,23 +96,22 @@ describe('<Togglable /> useImperativeHandle', () => {
 
     render(<TestComponent />)
 
-    const element = screen.getByText('togglable content')
     const parentButton = screen.getByText('toggle from parent')
 
     // Initially hidden
-    expect(element).not.toBeVisible()
+    expect(screen.queryByText('togglable content')).not.toBeInTheDocument()
 
     // Toggle to visible
     await user.click(parentButton)
-    expect(element).toBeVisible()
+    expect(screen.getByText('togglable content')).toBeInTheDocument()
 
     // Toggle back to hidden
     await user.click(parentButton)
-    expect(element).not.toBeVisible()
+    expect(screen.queryByText('togglable content')).not.toBeInTheDocument()
 
     // Toggle to visible again
     await user.click(parentButton)
-    expect(element).toBeVisible()
+    expect(screen.getByText('togglable content')).toBeInTheDocument()
   })
 
   test('ref method works after user interaction', async () => {
@@ -132,20 +134,19 @@ describe('<Togglable /> useImperativeHandle', () => {
 
     render(<TestComponent />)
 
-    const element = screen.getByText('togglable content')
-    const showButton = screen.getByText('show...')
+    const showButton = screen.getByRole('button', { name: /\+ show/ })
     const parentButton = screen.getByText('toggle from parent')
 
     // User clicks to show content
     await user.click(showButton)
-    expect(element).toBeVisible()
+    expect(screen.getByText('togglable content')).toBeInTheDocument()
 
     // Parent uses ref to hide content
     await user.click(parentButton)
-    expect(element).not.toBeVisible()
+    expect(screen.queryByText('togglable content')).not.toBeInTheDocument()
 
     // Parent uses ref to show content again
     await user.click(parentButton)
-    expect(element).toBeVisible()
+    expect(screen.getByText('togglable content')).toBeInTheDocument()
   })
 })
