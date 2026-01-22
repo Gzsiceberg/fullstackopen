@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useMutation } from '@apollo/client/react'
 import { ADD_BOOK, ALL_BOOKS, ALL_AUTHORS } from '../queries'
-import { updateCache } from '../App'
+import { updateCache } from '../apolloCache'
 
 const NewBook = (props) => {
   const [title, setTitle] = useState('')

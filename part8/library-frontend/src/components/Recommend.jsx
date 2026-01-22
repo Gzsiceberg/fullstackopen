@@ -7,7 +7,8 @@ const Recommend = (props) => {
 
   const booksResult = useQuery(ALL_BOOKS, {
     variables: { genre: favoriteGenre },
-    skip: !favoriteGenre || !props.show
+    skip: !favoriteGenre || !props.show,
+    cache: 'cache-and-network'
   })
 
   if (!props.show) {

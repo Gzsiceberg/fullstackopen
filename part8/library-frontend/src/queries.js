@@ -1,10 +1,10 @@
 import { ApolloClient, gql, HttpLink, InMemoryCache, split } from '@apollo/client'
-import { setContext } from '@apollo/client/link/context'
+import { SetContextLink } from '@apollo/client/link/context'
 import { getMainDefinition } from '@apollo/client/utilities'
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
 import { createClient } from 'graphql-ws'
 
-const authLink = setContext((_, { headers }) => {
+const authLink = new SetContextLink((_, { headers }) => {
   const token = localStorage.getItem('library-user-token')
   return {
     headers: {
