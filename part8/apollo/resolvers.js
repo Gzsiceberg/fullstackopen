@@ -31,13 +31,13 @@ const resolvers = {
   },
   Book: {
     author: async (root) => {
-      // If author is already populated (it's an object), return its name
+      // If author is already populated (it's an object with a name), return it
       if (root.author && root.author.name) {
-        return root.author.name
+        return root.author
       }
       // If author is an ID, fetch it
       const author = await Author.findById(root.author)
-      return author ? author.name : null
+      return author
     }
   },
   Mutation: {
