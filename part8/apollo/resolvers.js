@@ -26,7 +26,7 @@ const resolvers = {
       if (!args.author && args.genre) {
         return Book.find({ genres: args.genre }).populate('author')
       }
-      
+
       const author = await Author.findOne({ name: args.author })
       if (!author) return []
       return Book.find({ author: author._id, genres: args.genre }).populate('author')
@@ -75,12 +75,20 @@ const resolvers = {
         }
       }
       const book = new Book({ ...args, author: author._id })
+
       try {
-      await book.save()
-      
+        await book.save()
+      } catch (error) {
+        throw new GraphQLError('Saving book failed', {
+          extensions: {
+            code: 'BAD_USER_INPUT',
+            invalidArgs: args.title,
+            error
+          }
+        })
+      }
       const populatedBook = await book.populate('author')
       pubsub.publish('BOOK_ADDED', { bookAdded: populatedBook })
-      
       return populatedBook
     },
     editAuthor: async (parent, args, context) => {

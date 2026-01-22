@@ -12,7 +12,7 @@
     "dev": "node --watch index.js"
   },
   "dependencies": {
-    "@apollo/server": "^5.3.0",
+    "@as-integrations/express5": "^1.1.2",
     "@graphql-tools/schema": "^10.0.31",
     "body-parser": "^2.2.2",
     "cors": "^2.8.5",
