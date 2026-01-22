@@ -10,7 +10,7 @@ const Books = (props) => {
   
   // Query to get filtered books based on selected genre
   const filteredBooksResult = useQuery(ALL_BOOKS, {
-    variables: { genre },
+    variables: genre ? { genre } : undefined,
     skip: !props.show,
     fetchPolicy: 'cache-and-network'
   })

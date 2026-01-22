@@ -7,9 +7,6 @@ const cors = require('cors')
 const http = require('http')
 const { WebSocketServer } = require('ws')
 const { useServer } = require('graphql-ws/use/ws')
-const bodyParser = require('body-parser')
-
-const connectToDatabase = require('./db')
 const jwt = require('jsonwebtoken')
 const User = require('./models/user')
 
@@ -17,8 +14,6 @@ const resolvers = require('./resolvers')
 const typeDefs = require('./schema')
 
 const startServer = async (port) => {
-  const MONGODB_URI = process.env.MONGODB_URI
-  await connectToDatabase(MONGODB_URI)
 
   const app = express()
   const httpServer = http.createServer(app)
