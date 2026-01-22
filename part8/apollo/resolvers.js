@@ -3,6 +3,8 @@ const Author = require('./models/author')
 const User = require('./models/user')
 const jwt = require('jsonwebtoken')
 const { GraphQLError } = require('graphql')
+const { PubSub } = require('graphql-subscriptions')
+const pubsub = new PubSub()
 
 const resolvers = {
   Query: {
@@ -74,17 +76,12 @@ const resolvers = {
       }
       const book = new Book({ ...args, author: author._id })
       try {
-        await book.save()
-      } catch (error) {
-        throw new GraphQLError('Saving book failed', {
-          extensions: {
-            code: 'BAD_USER_INPUT',
-            invalidArgs: args.title,
-            error
-          }
-        })
-      }
-      return book.populate('author')
+      await book.save()
+      
+      const populatedBook = await book.populate('author')
+      pubsub.publish('BOOK_ADDED', { bookAdded: populatedBook })
+      
+      return populatedBook
     },
     editAuthor: async (parent, args, context) => {
       const currentUser = context.currentUser
@@ -143,7 +140,12 @@ const resolvers = {
 
       return { value: jwt.sign(userForToken, process.env.JWT_SECRET) }
     },
-  }
+  },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator('BOOK_ADDED')
+    },
+  },
 }
 
 module.exports = resolvers
