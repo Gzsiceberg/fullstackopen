@@ -9,7 +9,8 @@ const Authors = (props) => {
 
   const [editAuthor] = useMutation(EDIT_AUTHOR, {
     refetchQueries: [{ query: ALL_AUTHORS }],
-    skip: !props.show
+    skip: !props.show,
+    cache: 'cache-and-network'
   })
 
   useEffect(() => {
