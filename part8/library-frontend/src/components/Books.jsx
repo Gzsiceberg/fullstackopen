@@ -4,28 +4,33 @@ import { useState } from 'react'
 
 const Books = (props) => {
   const [genre, setGenre] = useState(null)
-  const result = useQuery(ALL_BOOKS)
+  
+  // Query to get all books for extracting genres
+  const allBooksResult = useQuery(ALL_BOOKS)
+  
+  // Query to get filtered books based on selected genre
+  const filteredBooksResult = useQuery(ALL_BOOKS, {
+    variables: { genre },
+    skip: !props.show
+  })
 
   if (!props.show) {
     return null
   }
-  if (result.loading) {
+
+  if (filteredBooksResult.loading || allBooksResult.loading) {
     return <div>loading...</div>
   }
 
-  if (result.error) {
-    return <div>Error: {result.error.message}</div>
+  if (filteredBooksResult.error) {
+    return <div>Error: {filteredBooksResult.error.message}</div>
   }
 
-  const books = result.data.allBooks
+  const books = filteredBooksResult.data.allBooks
+  const allBooks = allBooksResult.data?.allBooks || []
 
   // Calculate unique genres from all books
-  const genres = [...new Set(books.flatMap(b => b.genres))]
-
-  // Filter books if a genre is selected
-  const booksToShow = genre 
-    ? books.filter(b => b.genres.includes(genre))
-    : books
+  const genres = [...new Set(allBooks.flatMap(b => b.genres))]
 
   return (
     <div>
@@ -40,7 +45,7 @@ const Books = (props) => {
             <th>author</th>
             <th>published</th>
           </tr>
-            {booksToShow.map((a) => (
+            {books.map((a) => (
             <tr key={a.id}>
               <td>{a.title}</td>
               <td>{a.author.name}</td>
