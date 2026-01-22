@@ -20,15 +20,22 @@ export const client = new ApolloClient({
   cache: new InMemoryCache(),
 })
 
+const AUTHOR_DETAILS = gql`
+  fragment AuthorDetails on Author {
+    name
+    born
+    bookCount
+  }
+`
+
 export const ALL_AUTHORS = gql`
   query {
     allAuthors {
-      name
-      born
-      bookCount
-      id
+      ...AuthorDetails
+      id,
     }
   }
+  ${AUTHOR_DETAILS}
 `
 
 export const ALL_BOOKS = gql`
@@ -37,14 +44,13 @@ export const ALL_BOOKS = gql`
       title
       published
       author {
-        name
-        born
-        bookCount
+        ...AuthorDetails
       }
       genres
       id
     }
   }
+  ${AUTHOR_DETAILS}
 `
 
 export const EDIT_AUTHOR = gql`
