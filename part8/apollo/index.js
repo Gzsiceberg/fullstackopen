@@ -110,6 +110,7 @@ const typeDefs = /* GraphQL */ `
     name: String!
     bookCount: Int!
     born: Int
+    id: ID!
   }
 
   type Book {
@@ -117,6 +118,7 @@ const typeDefs = /* GraphQL */ `
     published: Int!
     author: String!
     genres: [String!]!
+    id: ID!
   }
 
   type Mutation {
