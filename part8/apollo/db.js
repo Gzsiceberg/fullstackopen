@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 
 const connectToDatabase = async (uri) => {
   console.log('connecting to database URI:', uri)
+  mongoose.set('strictQuery', false)
 
   try {
     await mongoose.connect(uri)
