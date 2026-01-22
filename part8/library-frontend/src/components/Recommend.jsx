@@ -3,7 +3,12 @@ import { ALL_BOOKS, ME } from '../queries'
 
 const Recommend = (props) => {
   const meResult = useQuery(ME)
-  const booksResult = useQuery(ALL_BOOKS)
+  const favoriteGenre = meResult.data?.me?.favoriteGenre
+
+  const booksResult = useQuery(ALL_BOOKS, {
+    variables: { genre: favoriteGenre },
+    skip: !favoriteGenre || !props.show
+  })
 
   if (!props.show) {
     return null
@@ -13,14 +18,11 @@ const Recommend = (props) => {
     return <div>loading...</div>
   }
 
-  const favoriteGenre = meResult.data?.me?.favoriteGenre
   const books = booksResult.data?.allBooks
 
   if (!favoriteGenre || !books) {
     return <div>Books not found or user not authenticated</div>
   }
-
-  const booksToShow = books.filter(b => b.genres.includes(favoriteGenre))
 
   return (
     <div>
@@ -33,7 +35,7 @@ const Recommend = (props) => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {booksToShow.map((a) => (
+          {books.map((a) => (
             <tr key={a.id}>
               <td>{a.title}</td>
               <td>{a.author.name}</td>
