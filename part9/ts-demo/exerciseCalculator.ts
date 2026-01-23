@@ -41,4 +41,20 @@ function calculateExercises(dailyHours: number[], target: number): Result {
   };
 }
 
-console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2));
+const args = process.argv.slice(2);
+
+if (args.length < 2) {
+  console.log('Please provide target and at least one daily exercise hour');
+  console.log('Usage: npm run calculateExercises <target> <day1> <day2> ...');
+  process.exit(1);
+}
+
+const target = Number(args[0]);
+const dailyHours = args.slice(1).map(Number);
+
+if (isNaN(target) || dailyHours.some(isNaN)) {
+  console.log('All arguments must be numbers');
+  process.exit(1);
+}
+
+console.log(calculateExercises(dailyHours, target));
