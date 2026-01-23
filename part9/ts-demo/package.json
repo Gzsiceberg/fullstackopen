@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "calculateExercises": "ts-node exerciseCalculator.ts",
-    "calculateBmi": "ts-node bmiCalculator.ts"
+    "calculateBmi": "ts-node bmiCalculator.ts",
+    "start": "ts-node index.ts"
   },
   "keywords": [],
   "author": "",
@@ -18,6 +19,11 @@
     "@types/lodash": "^4.17.23",
     "@types/mongoose": "^5.11.96",
     "@types/node": "^25.0.10",
-    "@types/react": "^19.2.9"
+    "@types/react": "^19.2.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
   }
 }
