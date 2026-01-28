@@ -1,3 +1,44 @@
+interface HeaderProps {
+  name: string;
+}
+
+const Header = (props: HeaderProps) => {
+  return <h1>{props.name}</h1>;
+};
+
+interface CoursePart {
+  name: string;
+  exerciseCount: number;
+}
+
+interface ContentProps {
+  courseParts: CoursePart[];
+}
+
+const Content = (props: ContentProps) => {
+  return (
+    <div>
+      {props.courseParts.map((part) => (
+        <p key={part.name}>
+          {part.name} {part.exerciseCount}
+        </p>
+      ))}
+    </div>
+  );
+};
+
+interface TotalProps {
+  total: number;
+}
+
+const Total = (props: TotalProps) => {
+  return (
+    <p>
+      Number of exercises {props.total}
+    </p>
+  );
+};
+
 const App = () => {
   const courseName = "Half Stack application development";
   const courseParts = [
@@ -19,19 +60,9 @@ const App = () => {
 
   return (
     <div>
-      <h1>{courseName}</h1>
-      <p>
-        {courseParts[0].name} {courseParts[0].exerciseCount}
-      </p>
-      <p>
-        {courseParts[1].name} {courseParts[1].exerciseCount}
-      </p>
-      <p>
-        {courseParts[2].name} {courseParts[2].exerciseCount}
-      </p>
-      <p>
-        Number of exercises {totalExercises}
-      </p>
+      <Header name={courseName} />
+      <Content courseParts={courseParts} />
+      <Total total={totalExercises} />
     </div>
   );
 };
