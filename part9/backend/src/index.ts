@@ -2,6 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import diagnosisRouter from './routes/diagnoses';
 import patientRouter from './routes/patients';
+import { errorHandler } from './middleware';
+
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -16,6 +18,12 @@ app.get('/api/ping', (_req, res) => {
 app.use('/api/diagnoses', diagnosisRouter);
 app.use('/api/patients', patientRouter);
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.use(errorHandler);
+
+export default app; // Export app for potential testing or other uses
+
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
