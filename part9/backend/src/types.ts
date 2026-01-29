@@ -75,3 +75,6 @@ export const NewPatientSchema = z.object({
 export type NonSensitivePatient = Omit<Patient, 'ssn' | 'entries'>;
 
 export type NewPatientEntry = z.infer<typeof NewPatientSchema>;
+
+type UnionOmit<T, K extends string | number | symbol> = T extends unknown ? Omit<T, K> : never;
+export type NewEntry = UnionOmit<Entry, 'id'>;
