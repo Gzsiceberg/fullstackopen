@@ -61,7 +61,14 @@ const PatientPage = () => {
           </Typography>
           {patient.entries.map((entry, index) => (
               <div key={index}>
-                  <p>{JSON.stringify(entry)}</p>
+                  <p>{entry.date} {entry.description}</p>
+                  <ul>
+                    {entry.diagnosisCodes?.map((code) => (
+                      <li key={code}>
+                        {code}
+                      </li>
+                    ))}
+                  </ul>
               </div>
           ))}
       </Box>
