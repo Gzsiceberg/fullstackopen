@@ -155,10 +155,11 @@ const AddEntryForm = ({ onCancel, onSubmit, diagnoses }: Props) => {
         />
         <TextField
           label="Date"
-          placeholder="YYYY-MM-DD"
+          type="date"
           fullWidth
           value={date}
           onChange={({ target }) => setDate(target.value)}
+          InputLabelProps={{ shrink: true }}
           style={{ marginBottom: 10 }}
         />
         <TextField
@@ -213,10 +214,11 @@ const AddEntryForm = ({ onCancel, onSubmit, diagnoses }: Props) => {
           <>
             <TextField
               label="Discharge Date"
-              placeholder="YYYY-MM-DD"
+              type="date"
               fullWidth
               value={dischargeDate}
               onChange={({ target }) => setDischargeDate(target.value)}
+              InputLabelProps={{ shrink: true }}
               style={{ marginBottom: 10 }}
             />
             <TextField
@@ -241,18 +243,20 @@ const AddEntryForm = ({ onCancel, onSubmit, diagnoses }: Props) => {
             />
             <TextField
               label="Sick Leave Start Date (optional)"
-              placeholder="YYYY-MM-DD"
+              type="date"
               fullWidth
               value={sickLeaveStartDate}
               onChange={({ target }) => setSickLeaveStartDate(target.value)}
+              InputLabelProps={{ shrink: true }}
               style={{ marginBottom: 10 }}
             />
             <TextField
               label="Sick Leave End Date (optional)"
-              placeholder="YYYY-MM-DD"
+              type="date"
               fullWidth
               value={sickLeaveEndDate}
               onChange={({ target }) => setSickLeaveEndDate(target.value)}
+              InputLabelProps={{ shrink: true }}
               style={{ marginBottom: 10 }}
             />
           </>
