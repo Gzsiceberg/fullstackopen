@@ -67,7 +67,6 @@ const App = () => {
           cloudy <input type="radio" name="weather" onChange={() => setNewWeather('cloudy')} checked={newWeather === 'cloudy'} />
           stormy <input type="radio" name="weather" onChange={() => setNewWeather('stormy')} checked={newWeather === 'stormy'} />
           windy <input type="radio" name="weather" onChange={() => setNewWeather('windy')} checked={newWeather === 'windy'} />
-          bad_option <input type="radio" name="weather" onChange={() => setNewWeather('bad_option')} checked={newWeather === 'bad_option'} />
         </div>
         <div>
           comment <input value={newComment} onChange={(event) => setNewComment(event.target.value)} />
