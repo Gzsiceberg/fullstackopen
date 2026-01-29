@@ -1,7 +1,6 @@
-import { Rating } from '@mui/material';
 import { Favorite } from '@mui/icons-material';
-
 import { styled } from '@mui/material/styles';
+import Rating from '@mui/material/Rating';
 
 type BarProps = {
   rating: number;

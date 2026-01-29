@@ -7,6 +7,7 @@ import TransgenderIcon from '@mui/icons-material/Transgender';
 
 import { Patient, Gender, Diagnosis } from "../../types";
 import patientService from "../../services/patients";
+import EntryDetails from "../EntryDetails";
 
 interface Props {
   diagnoses: Diagnosis[];
@@ -45,11 +46,6 @@ const PatientPage = ({ diagnoses }: Props) => {
     }
   };
 
-  const findDiagnosisName = (code: string) => {
-    const diagnosis = diagnoses.find(d => d.code === code);
-    return diagnosis ? diagnosis.name : null;
-  };
-
   return (
     <div className="App">
       <Box style={{ marginBottom: "1em", marginTop: "1em" }}>
@@ -68,17 +64,8 @@ const PatientPage = ({ diagnoses }: Props) => {
           <Typography variant="h5">
               entries
           </Typography>
-          {patient.entries.map((entry, index) => (
-              <div key={index}>
-                  <p>{entry.date} {entry.description}</p>
-                  <ul>
-                    {entry.diagnosisCodes?.map((code) => (
-                      <li key={code}>
-                        {code} {findDiagnosisName(code)}
-                      </li>
-                    ))}
-                  </ul>
-              </div>
+          {patient.entries.map((entry) => (
+              <EntryDetails key={entry.id} entry={entry} diagnoses={diagnoses} />
           ))}
       </Box>
     </div>
