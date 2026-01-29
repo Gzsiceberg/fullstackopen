@@ -5,10 +5,14 @@ import FemaleIcon from '@mui/icons-material/Female';
 import MaleIcon from '@mui/icons-material/Male';
 import TransgenderIcon from '@mui/icons-material/Transgender';
 
-import { Patient, Gender } from "../../types";
+import { Patient, Gender, Diagnosis } from "../../types";
 import patientService from "../../services/patients";
 
-const PatientPage = () => {
+interface Props {
+  diagnoses: Diagnosis[];
+}
+
+const PatientPage = ({ diagnoses }: Props) => {
   const { id } = useParams<{ id: string }>();
   const [patient, setPatient] = useState<Patient | null>(null);
 
@@ -41,6 +45,11 @@ const PatientPage = () => {
     }
   };
 
+  const findDiagnosisName = (code: string) => {
+    const diagnosis = diagnoses.find(d => d.code === code);
+    return diagnosis ? diagnosis.name : null;
+  };
+
   return (
     <div className="App">
       <Box style={{ marginBottom: "1em", marginTop: "1em" }}>
@@ -65,7 +74,7 @@ const PatientPage = () => {
                   <ul>
                     {entry.diagnosisCodes?.map((code) => (
                       <li key={code}>
-                        {code}
+                        {code} {findDiagnosisName(code)}
                       </li>
                     ))}
                   </ul>
