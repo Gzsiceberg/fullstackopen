@@ -19,7 +19,7 @@ const BaseEntrySchema = z.object({
 
 const HealthCheckEntrySchema = BaseEntrySchema.extend({
   type: z.literal("HealthCheck"),
-  healthCheckRating: z.nativeEnum(HealthCheckRating),
+  healthCheckRating: z.enum(HealthCheckRating),
 });
 
 const OccupationalHealthcareEntrySchema = BaseEntrySchema.extend({

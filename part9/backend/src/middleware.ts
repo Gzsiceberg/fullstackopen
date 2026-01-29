@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { NewPatientSchema } from './types';
-import { NewEntrySchema } from './utils';
+import { NewEntrySchema, parseDiagnosisCodes } from './utils';
 import { z } from 'zod';
 
 export const newPatientParser = (req: Request, _res: Response, next: NextFunction) => {
@@ -14,7 +14,19 @@ export const newPatientParser = (req: Request, _res: Response, next: NextFunctio
 
 export const newEntryParser = (req: Request, _res: Response, next: NextFunction) => {
     try {
-        NewEntrySchema.parse(req.body);
+        // Use parseDiagnosisCodes to safely extract and validate diagnosis codes
+        const diagnosisCodes = parseDiagnosisCodes(req.body);
+        
+        // Create a copy of the body with parsed diagnosis codes
+        const entryData = {
+            ...req.body,
+            diagnosisCodes: diagnosisCodes.length > 0 ? diagnosisCodes : undefined
+        };
+        
+        NewEntrySchema.parse(entryData);
+        
+        // Update req.body with the parsed data
+        req.body = entryData;
         next();
     } catch (error: unknown) {
         next(error);
